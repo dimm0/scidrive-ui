@@ -7,7 +7,7 @@ define( [
   "dojo/fx",
   "dojo/aspect",
   "dojo/dom-construct",
-  "dojo/request/xhr", 
+  "dojo/request/xhr",
   "dojo/json",
   "dojo/io-query",
   "dojo/has",
@@ -48,7 +48,14 @@ function(declare, lang, fx, connect, coreFx, aspect, domConstruct, xhr, JSON, io
                     identity = curIdentity;
                 }
             } else {
-                localStorage.setItem('vospace_oauth_s', JSON.stringify(identity));
+                try {
+                    localStorage.setItem('vospace_oauth_s', JSON.stringify(identity));
+                } catch (error) {
+                    if (error.code === DOMException.QUOTA_EXCEEDED_ERR && localStorage.length === 0)
+                        alert('Please disable private browsing mode to log in.');
+                    else
+                        throw error;
+                }
             }
 
             /* End Init identity object */
@@ -74,7 +81,7 @@ function(declare, lang, fx, connect, coreFx, aspect, domConstruct, xhr, JSON, io
                         vospace = lang.mixin(vospace, new SciServerLogin());
                         break;
                 }
-                return vospace; 
+                return vospace;
             });
 
             // store link to parent (needed to draw the regions control)
@@ -102,6 +109,7 @@ function(declare, lang, fx, connect, coreFx, aspect, domConstruct, xhr, JSON, io
             else
                 defaultReg.loginFunc(identity);
             console.debug("DONE INIT");
+
         }
 
     });
