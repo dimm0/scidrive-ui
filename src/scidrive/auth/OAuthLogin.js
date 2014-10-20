@@ -109,10 +109,9 @@ function(declare, lang, fx, connect, coreFx, aspect, domConstruct, xhr, JSON, io
             if(that.isShare) {
                 authorizeUrl += "&share="+that.id;
             }
-            alert("!!!");
             document.location.href = authorizeUrl;
         }
-        
+
         function success_open_window(data) {
             var respObject = ioQuery.queryToObject(data);
             var reqToken = respObject.oauth_token;
