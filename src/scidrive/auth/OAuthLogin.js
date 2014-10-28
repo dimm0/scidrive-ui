@@ -192,7 +192,7 @@ function(declare, lang, fx, connect, coreFx, aspect, domConstruct, xhr, JSON, io
 
     },
 
-    login2: function(vospace, component) {
+    login2: function(component) {
         var that = this;
         require(["scidrive/ScidrivePanel"], function(ScidrivePanel){
             var url = that.url+"/access_token";
@@ -254,7 +254,7 @@ function(declare, lang, fx, connect, coreFx, aspect, domConstruct, xhr, JSON, io
                     localStorage.setItem('vospace_oauth_s', JSON.stringify(identity));
 
                     if(ioargs.xhr.status == 401) {
-                        that.login(vospace, null);
+                        that.login(null);
                     } else {
                         alert("Error logging in: "+ ioargs.xhr.responseText);
                     }
@@ -265,16 +265,16 @@ function(declare, lang, fx, connect, coreFx, aspect, domConstruct, xhr, JSON, io
 
     },
 
-    logout: function(vospace, component) {
+    logout: function(component) {
         var identity = JSON.parse(localStorage.getItem('vospace_oauth_s'));
-        delete identity.regions[vospace.id];
+        delete identity.regions[this.id];
         localStorage.setItem('vospace_oauth_s', JSON.stringify(identity));
 
-        delete vospace.credentials;
+        delete this.credentials;
 
-        if(vospace.isShare) {
+        if(this.isShare) {
             this.vospaces = this.vospaces.filter(function(curvospace, index, array) {
-                return curvospace.id != vospace.id;
+                return curvospace.id != this.id;
             });
             dijit.byId("scidriveWidget").loginSelect.removeOption(vospace.id);
         }
@@ -288,20 +288,22 @@ function(declare, lang, fx, connect, coreFx, aspect, domConstruct, xhr, JSON, io
             if(vospace.defaultRegion) {
                 defaultVospace = vospace;
             }
-            if(undefined == authenticatedVospace && undefined != identity.regions[vospace.id]){
+            if("undefined" === typeof authenticatedVospace && "undefined" !== typeof identity.regions[vospace.id]){
                 authenticatedVospace = vospace;
             }
         }
 
-        //First try to login to default vospace if is authenticated or don't have any authenticated at all
-        if(undefined != identity.regions[defaultVospace.id] || undefined == authenticatedVospace) {
-            dijit.byId("scidriveWidget").loginToVO(defaultVospace, component);
+        // First try to login to default vospace if is authenticated or don't have any authenticated at all
+        if(undefined == authenticatedVospace) {
+            document.location.href = document.location.href.substr(0, document.location.href.lastIndexOf("/"));
+
         } else {
+            console.debug(component);
             dijit.byId("scidriveWidget").loginToVO(authenticatedVospace, component);
         }
 
         var otherComponent = (component == panel1)?panel2:panel1;
-        if(otherComponent != undefined && otherComponent.store.vospace.id == vospace.id && authenticatedVospace != undefined) {
+        if(otherComponent != undefined && otherComponent.store.vospace.id == this.id && authenticatedVospace != undefined) {
             dijit.byId("scidriveWidget").loginToVO(authenticatedVospace, otherComponent);
         }
 

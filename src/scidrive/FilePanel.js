@@ -519,7 +519,7 @@ define([
             },
 
             _logout: function() {
-                this.parentPanel.app.logout(this.store.vospace, this);
+                this.store.vospace.logout(this);
             },
 
             getUserInfo: function(updateInfo /* callback */ ) {

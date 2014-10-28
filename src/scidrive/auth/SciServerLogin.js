@@ -85,25 +85,24 @@ define([
             document.location.href = this.getRedirectUrl(this.loginUrl, true);
         },
 
-        logout: function(vospace, component, message) {
+        logout: function(component, message) {
 
         	// This is some magic I wouldn't like to touch
+            // Yeah, better not to touch this
             var identity = JSON.parse(localStorage.getItem('vospace_oauth_s'));
-            if(typeof vospace !== 'undefined') {
-                delete identity.regions[vospace.id];
-                localStorage.setItem('vospace_oauth_s', JSON.stringify(identity));
+            delete identity.regions[this.id];
+            localStorage.setItem('vospace_oauth_s', JSON.stringify(identity));
 
-                delete vospace.credentials;
+            delete this.credentials;
 
-                if(vospace.isShare) {
-                    this.vospaces = this.vospaces.filter(function(curvospace, index, array) {
-                        return curvospace.id != vospace.id;
-                    });
-                    dijit.byId("scidriveWidget").loginSelect.removeOption(vospace.id);
-                }
-
-                dijit.byId("scidriveWidget")._refreshRegions();
+            if(this.isShare) {
+                this.vospaces = this.vospaces.filter(function(curvospace, index, array) {
+                    return curvospace.id != vospace.id;
+                });
+                dijit.byId("scidriveWidget").loginSelect.removeOption(vospace.id);
             }
+
+            dijit.byId("scidriveWidget")._refreshRegions();
 
             // Redirect to logout page
             document.location.href = this.getRedirectUrl(this.logoutUrl, false);
