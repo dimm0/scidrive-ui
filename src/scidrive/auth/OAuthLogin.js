@@ -276,7 +276,7 @@ function(declare, lang, fx, connect, coreFx, aspect, domConstruct, xhr, JSON, io
             this.vospaces = this.vospaces.filter(function(curvospace, index, array) {
                 return curvospace.id != this.id;
             });
-            dijit.byId("scidriveWidget").loginSelect.removeOption(vospace.id);
+            dijit.byId("scidriveWidget").loginSelect.removeOption(this.id);
         }
 
         dijit.byId("scidriveWidget")._refreshRegions();
@@ -296,15 +296,14 @@ function(declare, lang, fx, connect, coreFx, aspect, domConstruct, xhr, JSON, io
         // First try to login to default vospace if is authenticated or don't have any authenticated at all
         if(undefined == authenticatedVospace) {
             document.location.href = document.location.href.substr(0, document.location.href.lastIndexOf("/"));
-
         } else {
-            console.debug(component);
             dijit.byId("scidriveWidget").loginToVO(authenticatedVospace, component);
         }
 
-        var otherComponent = (component == panel1)?panel2:panel1;
+        var scidrivePanel = dijit.byId("scidriveWidget");
+        var otherComponent = (component == scidrivePanel.panel1)?scidrivePanel.panel2:scidrivePanel.panel1;
         if(otherComponent != undefined && otherComponent.store.vospace.id == this.id && authenticatedVospace != undefined) {
-            dijit.byId("scidriveWidget").loginToVO(authenticatedVospace, otherComponent);
+            scidrivePanel.loginToVO(authenticatedVospace, otherComponent);
         }
 
         //component._refreshRegions();

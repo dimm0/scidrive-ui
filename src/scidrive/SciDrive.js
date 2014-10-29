@@ -41,7 +41,6 @@ function(declare, lang, fx, connect, coreFx, aspect, domConstruct, xhr, JSON, io
 
             if(undefined != localStorage.getItem('vospace_oauth_s')) {
                 var curIdentity = JSON.parse(localStorage.getItem('vospace_oauth_s'));
-                console.debug(curIdentity);
                 if(undefined == curIdentity.ver || (curIdentity.ver != this.identity_ver)){
                     localStorage.setItem('vospace_oauth_s', JSON.stringify(identity));
                 } else {

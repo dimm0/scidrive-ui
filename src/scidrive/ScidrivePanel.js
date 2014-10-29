@@ -336,7 +336,6 @@ define([
             if(!vospace.credentials) {
                 vospace.login(component, true);
             } else {
-              console.debug(component);
               if(component != null) {
                   store.parentPanel = component;
                   component.setStore(store);
