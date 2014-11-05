@@ -12,7 +12,7 @@ var SciDriveMessageHandler = function(e) {
 
 function sciDriveGetFile(callback) {
 	window.addEventListener('message',  SciDriveMessageHandler, false);
-    scidriveWindow = window.open('scidrive_chooser.html', 'authWindow', 'width=600, height=400');
+    scidriveWindow = window.open('//cadac-demo.sdsc.edu/scidrive/scidrive_chooser.html', 'authWindow', 'width=600, height=400');
     SciDriveCallback = callback;
 }
 
