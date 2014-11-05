@@ -73,19 +73,12 @@ perl -pe "
   s/<\!--.*?-->//g;                          # Strip comments
   s/\s+/ /g;                                 # Collapse white-space" > "$DISTDIR/index.html"
 
-cat "$SRCDIR/scidrive_chooser.html" | tr '\n' ' ' | \
-perl -pe "
-  s/<\!--.*?-->//g;                          # Strip comments
-  s/isDebug: *1/deps:['$LOADERMID']/;        # Remove isDebug, add deps
-  s/<script src=\"$LOADERMID.*?\/script>//;  # Remove script app/run
-  s/\s+/ /g;                                 # Collapse white-space" > "$DISTDIR/scidrive_chooser.html"
-
 cat "$SRCDIR/example.html" | tr '\n' ' ' | \
 perl -pe "
   s/<\!--.*?-->//g;                          # Strip comments
   s/\s+/ /g;                                 # Collapse white-space" > "$DISTDIR/example.html"
 
 cp -r src/bootstrap $DISTDIR/
-cp -r src/scidrive/scidrive_chooser.js $DISTDIR/
+cp -r $SRCDIR/scidrive_chooser.* $SRCDIR/example.html $DISTDIR/
 
 echo "Build complete"
