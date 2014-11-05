@@ -363,7 +363,7 @@ define([
                             }
                         ).then(
                             function(data) {
-                                window.opener.SciDriveGetResult({"url":data.url, "path":selectedItems[0].i.path});
+                                window.opener.postMessage(JSON.stringify({"url":data.url, "path":selectedItems[0].i.path}), "*");
                             },
                             function(error) {
                                 panel._handleError(error);
