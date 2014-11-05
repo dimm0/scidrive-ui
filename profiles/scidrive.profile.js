@@ -72,7 +72,9 @@ var profile = {
 			customBase: true
 		},
 		'scidrive/ScidrivePanel': {},
-		'scidrive/SciDrive': {}
+		'scidrive/SciDrive': {},
+		'scidrive_chooser/ScidrivePanel': {},
+		'scidrive_chooser/SciDrive': {}
 	},
 
 	// Providing hints to the build system allows code to be conditionally removed on a more granular level than

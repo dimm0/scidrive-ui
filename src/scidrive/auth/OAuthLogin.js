@@ -44,9 +44,10 @@ function(declare, lang, fx, connect, coreFx, aspect, domConstruct, xhr, JSON, io
             if(this.credentials.stage == "request") { // contains request token
                 this.login2(null);
             } else if(this.credentials.stage == "access") {
-                require(["scidrive/ScidrivePanel"], function(ScidrivePanel){
-                    if(undefined == dijit.byId("scidriveWidget")) {
-                        var pan = new ScidrivePanel({
+                require(["scidrive/ScidrivePanel", "scidrive/ScidriveChooserPanel"], function(SciDrivePanel, SciDriveChooserPanel){
+                    if("undefined" === typeof (dijit.byId("scidriveWidget"))) {
+                        var obj = (that.isChooser)?SciDriveChooserPanel:SciDrivePanel;
+                        var pan = new obj({
                             id: "scidriveWidget",
                             style: "width: 100%; height: 100%; opacity: 0;",
                             app: that
@@ -194,7 +195,8 @@ function(declare, lang, fx, connect, coreFx, aspect, domConstruct, xhr, JSON, io
 
     login2: function(component) {
         var that = this;
-        require(["scidrive/ScidrivePanel"], function(ScidrivePanel){
+        var obj = (this.isChooser)?SciDriveChooserPanel:SciDrivePanel;
+        require(["scidrive/ScidrivePanel", "scidrive/ScidriveChooserPanel"], function(SciDrivePanel, SciDriveChooserPanel){
             var url = that.url+"/access_token";
 
             dojo.xhrPost(OAuth.sign("POST", {
@@ -217,7 +219,8 @@ function(declare, lang, fx, connect, coreFx, aspect, domConstruct, xhr, JSON, io
                     localStorage.setItem('vospace_oauth_s', JSON.stringify(identity));
 
                     if(undefined == dijit.byId("scidriveWidget")) {
-                        var pan = new ScidrivePanel({
+                        var obj = (that.isChooser)?SciDriveChooserPanel:SciDrivePanel;
+                        var pan = new obj({
                             id: "scidriveWidget",
                             style: "width: 100%; height: 100%; opacity: 0;",
                             app: that

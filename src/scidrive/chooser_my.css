@@ -1,0 +1,291 @@
+@import "../dojo/resources/dojo.css";
+@import "../dijit/themes/tundra/tundra.css";
+@import "../dojox/grid/enhanced/resources/tundra/EnhancedGrid.css";
+@import "../dojox/layout/resources/FloatingPane.css";
+@import "../dojox/image/resources/Lightbox.css";
+@import "../dojox/grid/resources/tundraGrid.css";
+@import "../dojox/widget/Dialog/Dialog.css";
+@import "../dojox/mobile/themes/iphone/Switch.css";
+@import "../dojox/form/resources/CheckedMultiSelect.css";
+
+html, body {
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	border: 0;
+	padding: 0;
+	background: url("resources/interface/sd_logo.png") no-repeat fixed center;
+}
+
+.center {
+   width: 150px;
+   height: 150px;
+   position: absolute;
+   left: 50%;
+   top: 50%; 
+   margin-left: -75px;
+   margin-top: -75px;
+}
+
+.scidrive {
+	font-size: 1em;
+	font-family: Anaheim,Helvetica,Tahoma,Arial,clean,sans-serif;
+}
+
+.scidrive .dijitMenuItem {
+	font: inherit;
+}
+
+.topPanel {
+	background: url("resources/interface/toolbar_bg.png") repeat-x scroll left top #EAEAEA;
+	height: 55px;
+	margin: 0px;
+}
+
+.scidrive .shadow {
+	box-shadow: 0px 3px 5px rgba(40, 40, 40, 0.6);
+}
+
+.scidrive .topshadow {
+	box-shadow: 0px 7px 9px rgba(40, 40, 40, 0.6);
+}
+
+.scidrive .logo {
+	 height: 56px;
+	 margin-top: 16px;
+}
+
+.dijitToolbar.topToolbar {
+ 	position: relative;
+    top: 10px;
+    background: none;
+    border: 0px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.dijitToolbar.bottomToolbar, .bottomPanel {
+	background: url("resources/interface/toolbar_bg2.png") repeat-x scroll left top #EAEAEA;
+	background-size: 1px 45px;
+	height: 25px;
+	border-bottom: none;
+}
+
+.scidrive .dojoxGrid {
+	font-family: inherit;
+	font-size: 1em;
+	background: rgba(255, 255, 255, 0.8); 
+	/*border-right: 2px solid #e7e8e9;*/
+	-webkit-user-select: none;
+	user-select: none;
+}
+
+/* Grid header img */
+.scidrive .dojoxGridHeader .dojoxGridCell {
+	background: url("resources/interface/tabEnabled.png") repeat-x scroll center top #E9E9E9;
+	color: #58595b !important;
+	border-left: 2px solid white !important;
+	border-top: none;
+	border-bottom: none;
+	border-right: none;
+}
+
+/* Regular grid cell text font */
+.scidrive .dojoxGridCell, .scidrive .dojoxGridCellFocus, .dojoxGridCellFocus {
+	color: #414141;
+	border-bottom: none;
+	border-top: none;
+	border-left: 2px solid #e7e8e9;
+	border-right: none;
+}
+
+/* Remove lines on the left of grid */
+.scidrive .dojoxGridRowbarInner {
+	width: 0px;
+	border: none;
+}
+
+/* All cells white */
+.scidrive .dojoxGridRowOdd, .scidrive .dojoxGridRow {
+	background-color: transparent;
+}
+
+/* No label in orange progress bar */
+.scidrive .dijitProgressBarLabel {
+	visibility: hidden;
+}
+
+.scidrive .dojoxGridScrollbox {
+	background-color: transparent;
+}
+
+.dijitSelect .dijitButtonText, .tundra td.dijitMenuItemLabel {padding: 3px;}
+
+
+.dijitToolbar .dijitSelect {margin: 4px 0px 4px 4px;}
+
+.dojoxDialogTitleBar {cursor: auto; padding-top: 10px; font-size: 1.3em;}
+
+.scidrive .scidriveButton {font-size: 1.5em;}
+.scidrive .dijitTooltipContents {font-size: 1.1em;}
+
+.hover {background: lightgrey;}
+.errhover {background: red;}
+
+/* text button padding remove */
+.dijitInline.toolbarShadedButton.dijitButton, .dijitStretch.dijitButtonContents, .dijitReset.dijitInputField.dijitButtonText {
+	padding: 0px;
+}
+
+/* text button border */
+.dijitInline.toolbarShadedButton.dijitButton, .toolbarShadedButton.dijitButton.dijitButtonHover.dijitHover {
+	border-style: solid;
+	border-width: 7px;
+	border-color: #D1E4F6;
+    -moz-border-image:url("resources/interface/button.png") 10 round; /* Firefox */
+    -webkit-border-image:url("resources/interface/button.png") 10 round; /* Safari */
+    -o-border-image:url("resources/interface/button.png") 10 round; /* Opera */
+    border-image:url("resources/interface/button.png") 10 fill round;
+}
+
+.dj_ie .dijitInline.toolbarShadedButton.dijitButton, .dj_ie .toolbarShadedButton.dijitButton.dijitButtonHover.dijitHover {
+	border-style: solid;
+	border-width: 7px;
+	background-color: #C6D9E9;
+	border-color: #C6D9E9;
+}
+
+/* Text button toolbar font */
+.toolbarShadedButton .dijitInline.dijitButtonText {
+	color: #326EB7;
+	font-size: 1.5em;
+	font-weight: 600;
+}
+
+.toolbarShadedButton .dijitButtonNode {
+	width: 110px;
+}
+
+/* border around dropdown elements */
+.toolbarDropdown.dijitSelect, .toolbarDropdown .dijitButtonContents, .tundra .dijitSelect .dijitButtonContents,
+.dijitButtonNode .simpleButton {
+	border: 0px;
+	background: none;
+}
+
+/* dropdown left part border */
+.toolbarDropdown .dijitReset.dijitStretch.dijitButtonContents {
+	border-style: solid;
+	border-width: 8px;
+	border-color: #D1E4F6;
+	-moz-border-image: url("resources/interface/dropdown_border_left.png") 13 round;
+	-webkit-border-image: url("resources/interface/dropdown_border_left.png") 13 round;
+	-o-border-image: url("resources/interface/dropdown_border_left.png") 13 round;
+	border-image: url("resources/interface/dropdown_border_left.png") 13 fill round;
+}
+
+.dj_ie .toolbarDropdown .dijitReset.dijitStretch.dijitButtonContents {
+	border-style: solid;
+	border-width: 8px;
+	border-color: #C6D9E9;
+	background-color: #C6D9E9;
+}
+
+/* dropdown right part border */
+.toolbarDropdown .dijitReset.dijitRight.dijitButtonNode.dijitArrowButton.dijitDownArrowButton.dijitArrowButtonContainer {
+	border-style: solid;
+	border-width: 8px;
+	border-color: #D1E4F6;
+	-moz-border-image: url("resources/interface/dropdown_border_right.png") 13 round;
+	-webkit-border-image: url("resources/interface/dropdown_border_right.png") 13 round;
+	-o-border-image: url("resources/interface/dropdown_border_right.png") 13 round;
+	border-image: url("resources/interface/dropdown_border_right.png") 13 fill round;
+
+}
+
+.dj_ie .toolbarDropdown .dijitReset.dijitRight.dijitButtonNode.dijitArrowButton.dijitDownArrowButton.dijitArrowButtonContainer {
+	border-style: solid;
+	border-width: 8px;
+	border-color: #C6D9E9;
+	background-color: #C6D9E9;
+}
+
+.scidrive .dojoxGRidMasterView {
+	margin-top: 2px;
+}
+
+.pathelm {
+	cursor: pointer;
+}
+
+.ConfirmDialog .dijitDialogPaneContentArea {
+  margin: -10px -8px;
+  padding: 10px 8px;
+}
+
+.ConfirmDialog .dijitDialogPaneActionBar {
+  /* gray bar at bottom of dialog with OK/Cancel buttons */
+
+  background-color: #efefef;
+  padding: 3px 5px 2px 7px;
+  text-align: right;
+  border-top: 1px solid #d3d3d3;
+  margin: 10px -8px -10px;
+}
+
+.scidrive .fileUploadPanel {
+	position: fixed;
+	right: 20px;
+	bottom: 30px;
+	overflow: auto;
+	width: 330px;
+	max-height:250px;
+	border: 1px solid black;
+	background: rgba(245, 245, 245, 0.85);
+	border-radius: 5px;
+	padding: 8px;
+}
+
+.scidrive .fileUploadProgress {
+	width: 320px;
+}
+
+.scidrive .containersSelect .dojoxCheckedMultiSelectWrapper {
+    width: 99%;
+    height: 135px;
+}
+
+/* Dialogs buttons */
+
+/* text button dialog border */
+.dijitInline.dialogShadedButton.dijitButton, .dialogShadedButton.dijitButton.dijitButtonHover.dijitHover,
+.dijitInline.dialogShadedButton.dijitToggleButton, .dialogShadedButton.dijitToggleButton.dijitButtonHover.dijitHover {
+	border-style: solid;
+	border-width: 4px;
+    -moz-border-image:url("resources/interface/button.png") 10 round; /* Firefox */
+    -webkit-border-image:url("resources/interface/button.png") 10 round; /* Safari */
+    -o-border-image:url("resources/interface/button.png") 10 round; /* Opera */
+    border-image:url("resources/interface/button.png") 10 fill round;
+}
+
+.dj_ie .dijitInline.dialogShadedButton.dijitButton, .dj_ie .dialogShadedButton.dijitButton.dijitButtonHover.dijitHover,
+.dj_ie .dijitInline.dialogShadedButton.dijitToggleButton, .dj_ie .dialogShadedButton.dijitToggleButton.dijitButtonHover.dijitHover {
+	border-style: solid;
+	border-width: 7px;
+	background-color: #C6D9E9;
+	border-color: #C6D9E9;
+}
+
+.dialogShadedButton .dijitButtonNode, .dialogShadedButton .dijitInline.dijitButtonNode {
+	background: none;
+	border: 0px;
+	padding: 0px;
+}
+
+.dialogShadedButton .dijitButtonNode {
+	width: 120px;
+}
+
+.dialogShadedButton .dijitInline.dijitButtonText {
+	color: #326EB7;
+}

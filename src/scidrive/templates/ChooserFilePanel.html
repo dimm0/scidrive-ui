@@ -1,0 +1,60 @@
+<div>
+	<div class="dijitHidden">
+		<!-- Transfer from URL dialog -->
+		<div data-dojo-type="dijit.Dialog" data-dojo-attach-point="transferUrlDialog" title="Transfer URL" data-dojo-attach-event="execute:_pullToVo">
+			<div data-dojo-type="dijit.form.TextBox" type="hidden" data-dojo-attach-point="transferNode"></div>
+            <input type="text" data-dojo-props="regExp: '(https?|ftp)://[A-Za-z0-9-_]+\.[A-Za-z0-9-_%&~\?\/\.=]+', required:true, trim:true" data-dojo-attach-point="urlInput" style="width: 420px;" data-dojo-type="dijit.form.ValidationTextBox"/>
+			<div style="margin: 15px auto; width: 285px;">
+				<button data-dojo-type="dijit.form.Button" type="button" data-dojo-props="class:'dialogShadedButton'">Create transfer
+					<script type="dojo/on" data-dojo-event="click" data-dojo-args="evt">
+						var dialog = this.getParent();
+						if(dialog.validate()) {
+							dialog.execute();
+							dialog.hide();
+						}
+				    </script>
+				</button>
+				<button data-dojo-type="dijit.form.Button" type="button" data-dojo-props="class:'dialogShadedButton'">Cancel
+					<script type="dojo/on" data-dojo-event="click" data-dojo-args="evt">
+						this.getParent().hide();
+				    </script>
+				</button>
+			</div>
+		</div>
+
+		<!-- Choose group dialog -->
+		<div data-dojo-type="dijit/Dialog" data-dojo-attach-point="chooseShareGroupDialog" title="Choose group for sharing" data-dojo-attach-event="execute: _createShare" data-dojo-props="class:'dialog'">
+			<div style="margin:0px auto; width: 450px;">
+				<div>
+					<input type="radio" name="groupEnable" checked value="off" data-dojo-attach-event="onclick:_disableShareGroup"/><label> No group: anonymous access</label>
+				</div>
+				<div style="margin: 5px 0px;">
+					<input type="radio" name="groupEnable" value="on" data-dojo-attach-event="onclick:_enableShareGroup"/><label> Choose group:</label><br/>
+					<input type="hidden" data-dojo-attach-point="groupEnable" value="off"/>
+				</div>
+		    	<div data-dojo-type="dijit/form/FilteringSelect" data-dojo-attach-point="shareSelect" data-dojo-props="searchAttr:'name', queryExpr: '*\$\{0\}*', autoComplete: false, disabled: 'disabled'" style="width: 100%;"></div>
+			</div>
+	    	<div style="margin: 10px 0px; display: none; box-shadow: 0px 3px 5px rgba(50, 50, 50, 0.75);" data-dojo-attach-point="usersListDiv">
+	    		<div style="background-color: #FAFAFA; padding: 5px;">Group members who will get access:</div>
+		    	<div data-dojo-attach-point="usersList" style="width: 430px; height: 0px; padding: 5px; overflow-y:scroll"></div>
+			</div>
+			<div><input name="readonlycheck" data-dojo-attach-point="readOnlyCheckBox" data-dojo-type="dijit/form/CheckBox" value="true" checked/> <label>Read only</label></div>
+			<center>
+				<button data-dojo-type="dijit.form.Button" data-dojo-props="class:'dialogShadedButton'" type="submit">Create share
+				</button>
+				<button data-dojo-type="dijit.form.Button" data-dojo-props="class:'dialogShadedButton'">Cancel
+					<script type="dojo/on" data-dojo-event="click">
+						this.getParent().hide();
+					</script>
+				</button>
+			</center>
+		</div>
+
+	</div>
+
+	<!-- Main panel -->
+	<div data-dojo-attach-point="grid">
+	</div>
+
+
+</div>

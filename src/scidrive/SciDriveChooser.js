@@ -22,7 +22,7 @@ function(declare, lang, fx, connect, coreFx, aspect, domConstruct, xhr, JSON, io
     return declare( null, {
 
         identity_ver: "1.4",
-        isChooser: false,
+        isChooser: true,
 
         constructor: function(args) {
             declare.safeMixin(this, args);

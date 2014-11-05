@@ -24,7 +24,7 @@ define([
         "dijit/_TemplatedMixin",
         "dijit/_WidgetsInTemplateMixin",
         "dijit/layout/_ContentPaneResizeMixin",
-        "dojo/text!./templates/FilePanel.html",
+        "dojo/text!./templates/ChooserFilePanel.html",
         "dijit/layout/BorderContainer",
         "dijit/layout/ContentPane",
         "dijit/layout/_LayoutWidget",
@@ -352,6 +352,25 @@ define([
                         }
                     });
 
+                    on(this.parentPanel.selectButton, "click", function(e) {
+
+                        var selectedItems = panel.gridWidget.selection.getSelected("row", true);
+
+                        panel.store.vospace.request(
+                            encodeURI(panel.store.vospace.url + "/1/media/sandbox" + selectedItems[0].i.path),
+                            "GET", {
+                                handleAs: "json"
+                            }
+                        ).then(
+                            function(data) {
+                                window.opener.SciDriveGetResult({"url":data.url, "path":selectedItems[0].i.path});
+                            },
+                            function(error) {
+                                panel._handleError(error);
+                            }
+                        );
+                    });
+
                     connect.connect(this.gridWidget, "onRowContextMenu", this, "_rowcontextmenu");
                     on(this, "click", function(e) {
                         this.parentPanel.updateCurrentPanel(this);
@@ -360,7 +379,7 @@ define([
                     /*Call startup() to render the grid*/
                     this.gridWidget.startup();
 
-                    this.parentPanel.updateCurrentPanel(this);
+                    // this.parentPanel.updateCurrentPanel(this);
                 }
 
             },
@@ -404,46 +423,6 @@ define([
                 }
             },
 
-            _deleteSelection: function(path) {
-                var panel = this;
-                MessageBox.confirm({
-                    message: "Delete files?"
-                }).then(function() {
-                    if (path instanceof Array) {
-                        for (var i = 0; i < path.length; i++) {
-                            panel.store.vospace.request(
-                                encodeURI(panel.store.vospace.url + "/nodes" + path[i].i.path),
-                                "DELETE", {
-                                    handleAs: "text"
-                                }
-                            ).then(
-                                function(data) {
-                                    panel._refresh(true);
-                                },
-                                function(error) {
-                                    panel._handleError(error);
-                                }
-                            );
-                        }
-
-                    } else {
-                        panel.store.vospace.request(
-                            encodeURI(panel.store.vospace.url + "/nodes" + path.i.path),
-                            "DELETE", {
-                                handleAs: "text"
-                            }
-                        ).then(
-                            function(data) {
-                                panel._refresh(true);
-                            },
-                            function(error) {
-                                panel._handleError(error);
-                            }
-                        );
-                    }
-                });
-            },
-
             setStore: function(store) {
                 this.store = store;
                 this.gridWidget.setStore(store);
@@ -458,23 +437,29 @@ define([
 
             _getName: function(path, rowIndex) {
                 var pathTokens = path.split('/');
+                
+                var len = 40;
+                var name = pathTokens[pathTokens.length - 1];
+                if (name && name.length > len) {
+                    name = "<span title='" + name + "'>" + name.substring(0, len) + "...</span>";
+                }
 
                 switch (this.grid.getItem(rowIndex).i.icon) {
                     case "folder_public":
-                        return "<img src='scidrive/resources/folder.jpg' style='vertical-align:middle' title='Folder' alt='Folder' width='20'/>&nbsp;" + pathTokens[pathTokens.length - 1];
+                        return "<img src='scidrive/resources/folder.jpg' style='vertical-align:middle' title='Folder' alt='Folder' width='20'/>&nbsp;" + name;
                     case "file":
-                        return "<img src='scidrive/resources/file.png' style='vertical-align:middle' title='File' alt='File' width='20'/>&nbsp;" + pathTokens[pathTokens.length - 1];
+                        return "<img src='scidrive/resources/file.png' style='vertical-align:middle' title='File' alt='File' width='20'/>&nbsp;" + name;
                     case "table":
-                        return "<img src='scidrive/resources/table.png' style='vertical-align:middle' title='File' alt='File' width='20'/>&nbsp;" + pathTokens[pathTokens.length - 1];
+                        return "<img src='scidrive/resources/table.png' style='vertical-align:middle' title='File' alt='File' width='20'/>&nbsp;" + name;
                 }
             },
 
-            _shortenString: function(mime, rowIndex) {
-                var max_len = 40;
-                if (!mime || mime.length < max_len) {
-                    return mime;
+            _shortenString: function(name, rowIndex) {
+                var len = 20;
+                if (!name || name.length < len) {
+                    return name;
                 } else {
-                    return "<span title='" + mime + "'>" + mime.substring(0, max_len) + "...</span>";
+                    return "<span title='" + name + "'>" + name.substring(0, len) + "...</span>";
                 }
             },
 
