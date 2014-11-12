@@ -1,4 +1,4 @@
-define([
+﻿define([
   "dojo/_base/declare", 
   "dojo/_base/array", 
   "dojo/_base/lang",
@@ -497,7 +497,7 @@ define([
 
           var dialog = new Dialog({
             title: "Settings",
-            style: "width: 95%; height: 600px;",
+            style: "width: 95%; height: 500px;",
             onHide: function() {
               this.destroyRecursive();
             }
