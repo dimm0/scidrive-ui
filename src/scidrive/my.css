@@ -7,6 +7,7 @@
 @import "../dojox/widget/Dialog/Dialog.css";
 @import "../dojox/mobile/themes/iphone/Switch.css";
 @import "../dojox/form/resources/CheckedMultiSelect.css";
+@import "../gridx/resources/claro/Gridx.css";
 
 html, body {
 	width: 100%;

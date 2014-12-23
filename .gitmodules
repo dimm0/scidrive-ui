@@ -13,3 +13,6 @@
 [submodule "src/util"]
 	path = src/util
 	url = git://github.com/dojo/util.git
+[submodule "src/gridx"]
+	path = src/gridx
+	url = https://github.com/oria/gridx.git

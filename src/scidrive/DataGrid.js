@@ -1,49 +1,15 @@
-define(["dojox/grid/EnhancedGrid", "dojo/_base/declare", "dojo/_base/array", "dojo/_base/lang", "dojo/_base/html"],
-function(EnhancedGrid, declare, array, lang, html) {
-    var DataGrid =  declare("scidrive.DataGrid", [EnhancedGrid], {
+define(["gridx/Grid", "dojo/_base/declare", "dojo/_base/array", "dojo/_base/lang", "dojo/_base/html"],
+function(GridX, declare, array, lang, html) {
+    var DataGrid =  declare("scidrive.DataGrid", [GridX], {
 
         _currentPath : '/',
         _eventSource: null,
 
-        _fetch: function(start, isRender){
-            // summary:
-            //      Overwritten, see DataGrid._fetch()
-            if(this.items){
-                return this.inherited(arguments);
-            }
-            start = start || 0;
-            if(this.store && !this._pending_requests[start]){
-                if(!this._isLoaded && !this._isLoading){
-                    this._isLoading = true;
-                    this.showMessage(this.loadingMessage);
-                }
-                this._pending_requests[start] = true;
-                try{
-                    var req = {
-                        start: start,
-                        count: this.rowsPerPage,
-                        query: this.query,
-                        sort: this.getSortProps(),
-                        queryOptions: this.queryOptions,
-                        isRender: isRender,
-                        path: this._currentPath,
-
-                        onBegin: lang.hitch(this, "_onFetchBegin"),
-                        onComplete: lang.hitch(this, "_onFetchComplete"),
-                        onError: lang.hitch(this, "_onFetchError")
-                    };
-                    this._storeLayerFetch(req);
-                }catch(e){
-                    this._onFetchError(e, {start: start, count: this.rowsPerPage});
-                }
-            }
-            return 0;
-        },
-
         setCurrentPath: function(path) {
+            this.query.path = path;
             this._currentPath = path;
-            this.plugin('selector').clear();
-            this._refresh(true);
+            this.model.clearCache();
+            this.body.refresh();
             this._updateEventSource();
         },
 
@@ -71,7 +37,7 @@ function(EnhancedGrid, declare, array, lang, html) {
                 parser.href = this.store.vospace.url;
 
                 dojo.xhrGet(scidrive.OAuth.sign("GET", {
-                    url: encodeURI(panel.store.vospace.url+"/updates?path="+panel._currentPath),
+                    url: encodeURI(panel.store.vospace.url+"/updates?path="+panel.query.path),
                     handleAs: "text",
                     load: function(data){
                         panel._eventSource = new EventSource(panel.store.vospace.url+'/updates/'+data);
@@ -90,17 +56,7 @@ function(EnhancedGrid, declare, array, lang, html) {
                     }
                 }, panel.store.vospace.credentials));
             }
-        },
-
-        setStore: function(store) {
-            var oldStore = this.store;
-            this._currentPath = "/";
-            this.inherited("setStore", arguments);
-            if(null != oldStore){
-                oldStore.close();
-            }
         }
-
 
     });
 

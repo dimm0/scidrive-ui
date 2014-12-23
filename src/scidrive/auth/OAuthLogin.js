@@ -195,8 +195,8 @@ function(declare, lang, fx, connect, coreFx, aspect, domConstruct, xhr, JSON, io
 
     login2: function(component) {
         var that = this;
-        var obj = (this.isChooser)?SciDriveChooserPanel:SciDrivePanel;
         require(["scidrive/ScidrivePanel", "scidrive/ScidriveChooserPanel"], function(SciDrivePanel, SciDriveChooserPanel){
+            var obj = (this.isChooser)?SciDriveChooserPanel:SciDrivePanel;
             var url = that.url+"/access_token";
 
             dojo.xhrPost(OAuth.sign("POST", {

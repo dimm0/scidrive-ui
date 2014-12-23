@@ -46,12 +46,21 @@ define([
         "dojox/widget/Dialog",
         "dojo/data/ItemFileWriteStore",
         "dijit/TitlePane",
+        "gridx/core/model/cache/Async",
+
+        'gridx/modules/Focus',
+        'gridx/modules/ColumnResizer',
+        'gridx/modules/extendedSelect/Row',
+        'gridx/modules/VirtualVScroller',
+        'gridx/modules/Menu',
+
         "scidrive/XMLWriter"
     ],
     function(declare, connect, fx, Deferred, aspect, array, on, keys, domConstruct, domStyle, domAttr, Memory, WidgetBase, PaginationPlugin, DnDPlugin, SelectorPlugin,
         MenuPlugin, DataGrid, Menu, LightBox, ConfirmDialog, MetadataViewer, TemplatedMixin, WidgetsInTemplateMixin, _ContentPaneResizeMixin, template, BorderContainer, ContentPane, _LayoutWidget,
         Form, Button, Select, CheckBox, ValidationTextBox, TextBox, Textarea,
-        FilteringSelect, PopupMenuBarItem, DropDownMenu, InlineEditBox, Toolbar, ProgressBar, Dialog, registry, dojox_Dialog, ItemFileWriteStore, TitlePane, XMLWriter
+        FilteringSelect, PopupMenuBarItem, DropDownMenu, InlineEditBox, Toolbar, ProgressBar, Dialog, registry, dojox_Dialog, ItemFileWriteStore, TitlePane, Async,
+        Focus, ColumnResizer, ExtendedSelectRow, VirtualVScroller, GridMenu, XMLWriter
     ) {
         return declare([WidgetBase, _LayoutWidget, _ContentPaneResizeMixin /* These 2 make it resizing in height on window resize */ , TemplatedMixin, WidgetsInTemplateMixin], {
 
@@ -144,7 +153,7 @@ define([
                     rowMenuObject.addChild(new dijit.MenuItem({
                         label: "Delete",
                         onClick: function(e) {
-                            var selectedItems = panel.gridWidget.selection.getSelected("row", true);
+                            var selectedItems = panel.gridWidget.select.row.getSelected();
 
                             if (selectedItems != undefined) {
                                 var selected = selectedItems.filter(function(val) {
@@ -255,10 +264,7 @@ define([
 
                     rowMenuObject.startup();
 
-                    this.gridWidget = new DataGrid({
-                        id: this.grid.id,
-                        store: this.store,
-                        structure: [
+                    var structure =
                             [
                                 //{ name: ' ', field: 'is_dir' , formatter: this._formatFileIcon, width: '3%'},
                                 {
@@ -275,48 +281,49 @@ define([
                                 {
                                     name: 'Type',
                                     field: 'mime_type',
-                                    formatter: this._shortenString,
+                                    decorator: this._shortenString,
                                     width: "30%"
                                 }
-                            ]
-                        ],
-                        rowSelector: '0px',
+                            ];
+
+                    this.gridWidget = new DataGrid({
+                        id: this.grid.id,
+                        store: this.store,
+                        cacheClass: Async,
+                        structure: structure,
                         canSort: false,
-                        plugins: {
-                            pagination: {
-                                defaultPageSize: 25, // Integer, what page size will be used by default
-                                gotoButton: true
-                            },
-                            dnd: {
-                                'dndConfig': {
-                                    'out': {
-                                        col: false,
-                                        row: true,
-                                        cell: false
-                                    },
-                                    'in': {
-                                        col: false,
-                                        row: true,
-                                        cell: false
-                                    },
-                                    'within': false
-                                }
-                            },
-                            selector: {
-                                row: 'multiple',
-                                cell: 'disabled',
-                                col: 'disabled'
-                            },
-                            menus: {
-                                rowMenu: rowMenuObject.id
-                            }
-                        },
+                        modules: [
+                            Focus,
+                            ColumnResizer,
+                            ExtendedSelectRow,
+                            VirtualVScroller,
+                            GridMenu
+                        ],
+                        // plugins: {
+                        //     dnd: {
+                        //         'dndConfig': {
+                        //             'out': {
+                        //                 col: false,
+                        //                 row: true,
+                        //                 cell: false
+                        //             },
+                        //             'in': {
+                        //                 col: false,
+                        //                 row: true,
+                        //                 cell: false
+                        //             },
+                        //             'within': false
+                        //         }
+                        //     },
+                        // },
+                        selectRowTriggerOnCell: true,
                         query: {
-                            list: 'true'
+                            list: 'true',
+                            path: "/"
                         },
                         pathWidget: this.pathSelect,
                         onRowDblClick: function(e) {
-                            var item = this.selection.getSelected("row", true)[0];
+                            var item = this.row(e.rowId).item();
                             if (item.i.is_dir) {
                                 this.setCurrentPath(item.i.path);
                                 panel.parentPanel.updateCurrentPanel(panel);
@@ -343,7 +350,7 @@ define([
                             }
                         }
                     }, this.grid);
-                    connect.connect(this.gridWidget.plugin('dnd'), "onDragIn", this, "_dragIn");
+                    // connect.connect(this.gridWidget.plugin('dnd'), "onDragIn", this, "_dragIn");
 
                     connect.connect(this.gridWidget, "dokeypress", this, function(e) {
                         if (e.keyCode == keys.DELETE) { // press delete on grid
@@ -352,13 +359,16 @@ define([
                         }
                     });
 
+                    this.gridWidget.menu.bind(rowMenuObject, {hookPoint: "row"});
                     connect.connect(this.gridWidget, "onRowContextMenu", this, "_rowcontextmenu");
+
                     on(this, "click", function(e) {
                         this.parentPanel.updateCurrentPanel(this);
                     });
 
-                    /*Call startup() to render the grid*/
+                    // /*Call startup() to render the grid*/
                     this.gridWidget.startup();
+
 
                     this.parentPanel.updateCurrentPanel(this);
                 }
@@ -372,8 +382,8 @@ define([
             _refresh: function(notRefreshIfUpdating) {
                 var gridIsUpdating = ((this.gridWidget._eventSource != null) && (this.gridWidget._eventSource.readyState == 1));
                 if (!(gridIsUpdating && notRefreshIfUpdating)) {
-                    this.gridWidget._refresh(true);
-                    this.gridWidget.plugin('selector').clear();
+                    this.gridWidget.model.clearCache();
+                    this.gridWidget.body.refresh();
                 }
             },
 
@@ -410,9 +420,12 @@ define([
                     message: "Delete files?"
                 }).then(function() {
                     if (path instanceof Array) {
-                        for (var i = 0; i < path.length; i++) {
+                        var filesToDelete = path.map(function(item){
+                            return item.i.path;
+                        });
+                        for (var i = 0; i < filesToDelete.length; i++) {
                             panel.store.vospace.request(
-                                encodeURI(panel.store.vospace.url + "/nodes" + path[i].i.path),
+                                encodeURI(panel.store.vospace.url + "/nodes" + filesToDelete[i]),
                                 "DELETE", {
                                     handleAs: "text"
                                 }
@@ -456,10 +469,10 @@ define([
                 this.parentPanel.updateCurrentPanel(this);
             },
 
-            _getName: function(path, rowIndex) {
+            _getName: function(row, path) {
                 var pathTokens = path.split('/');
 
-                switch (this.grid.getItem(rowIndex).i.icon) {
+                switch (row.icon) {
                     case "folder_public":
                         return "<img src='scidrive/resources/folder.jpg' style='vertical-align:middle' title='Folder' alt='Folder' width='20'/>&nbsp;" + pathTokens[pathTokens.length - 1];
                     case "file":
@@ -469,7 +482,7 @@ define([
                 }
             },
 
-            _shortenString: function(mime, rowIndex) {
+            _shortenString: function(mime, rowId, rowIndex) {
                 var max_len = 40;
                 if (!mime || mime.length < max_len) {
                     return mime;
@@ -704,7 +717,7 @@ define([
             },
 
             _rowcontextmenu: function(e) {
-                this._menuSelectedItem = this.gridWidget.getItem(e.rowIndex);
+                this._menuSelectedItem = this.gridWidget.row(e.rowId).item();
 
                 if (this._menuSelectedItem.i.mime_type && this._menuSelectedItem.i.mime_type.indexOf("image") == 0) {
                     this._menuItems["previewMenuItem"].set("disabled", false);

@@ -45,8 +45,7 @@ define(["dojox/data/QueryReadStore", "dojo/_base/declare", "dojo/json", "dojo/re
 				this._numRows = (this._numRows === -1) ? this._items.length : this._numRows;
 				fetchHandler(this._items, request, this._numRows);
 			}else{
-				var fullUrl = this.vospace.url+"/1/metadata/sandbox"+((request.path+"" != "")?request.path:"");
-				
+				var fullUrl = this.vospace.url+"/1/metadata/sandbox"+((request.query.path+"" != "")?request.query.path:"");
 				var xhrHandler = this.vospace.request(fullUrl, this.requestMethod.toUpperCase(), 
 					{
 						handleAs:"json", 

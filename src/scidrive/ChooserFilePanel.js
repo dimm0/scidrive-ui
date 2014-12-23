@@ -391,8 +391,8 @@ define([
             _refresh: function(notRefreshIfUpdating) {
                 var gridIsUpdating = ((this.gridWidget._eventSource != null) && (this.gridWidget._eventSource.readyState == 1));
                 if (!(gridIsUpdating && notRefreshIfUpdating)) {
-                    this.gridWidget._refresh(true);
-                    this.gridWidget.plugin('selector').clear();
+                    this.gridWidget.model.clearCache();
+                    this.gridWidget.body.refresh();
                 }
             },
 
