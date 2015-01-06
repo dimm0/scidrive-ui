@@ -1,4 +1,4 @@
-define(["dojox/data/QueryReadStore", "dojo/_base/declare", "dojo/json", "dojo/request/xhr", "scidrive/XMLWriter"], function(QueryReadStore, declare, JSON, xhr, XMLWriter) {
+define(["dojox/data/QueryReadStore", "dojo/_base/declare", "dojo/json", "dojo/request/xhr", "dojo/io-query", "scidrive/XMLWriter"], function(QueryReadStore, declare, JSON, xhr, ioQuery, XMLWriter) {
     return declare([QueryReadStore], {
 	
     	_lastPath : null,
@@ -15,9 +15,7 @@ define(["dojox/data/QueryReadStore", "dojo/_base/declare", "dojo/json", "dojo/re
 		parentPanel: null,
 
 		_fetchItems: function(request, fetchHandler, errorHandler){
-
-			var cur = this;
-
+			var that = this;
 			var serverQuery = request.serverQuery || request.query || {};
 			//Need to add start and count
 			if(!this.doClientPaging){
@@ -39,13 +37,14 @@ define(["dojox/data/QueryReadStore", "dojo/_base/declare", "dojo/json", "dojo/re
 			// Compare the last query and the current query by simply json-encoding them,
 			// so we dont have to do any deep object compare ... is there some dojo.areObjectsEqual()???
 			if(this.doClientPaging && this._lastServerQuery !== null &&
-				JSON.stringify(serverQuery) == JSON.stringify(this._lastServerQuery) &&
+				dojo.toJson(serverQuery) == dojo.toJson(this._lastServerQuery) &&
 				this._lastPath == request.path
 				){
 				this._numRows = (this._numRows === -1) ? this._items.length : this._numRows;
 				fetchHandler(this._items, request, this._numRows);
 			}else{
 				var fullUrl = this.vospace.url+"/1/metadata/sandbox"+((request.query.path+"" != "")?request.query.path:"");
+				console.debug(serverQuery);
 				var xhrHandler = this.vospace.request(fullUrl, this.requestMethod.toUpperCase(), 
 					{
 						handleAs:"json", 
@@ -57,7 +56,7 @@ define(["dojox/data/QueryReadStore", "dojo/_base/declare", "dojo/json", "dojo/re
 					xhrHandler.cancel();
 				};
 				xhrHandler.then(function(data){
-					cur._xhrFetchHandler(data, request, fetchHandler, errorHandler);
+					that._xhrFetchHandler(data, request, fetchHandler, errorHandler);
 				}, function(error){
 					errorHandler(error, request);
 				});

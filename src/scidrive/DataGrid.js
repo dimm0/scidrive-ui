@@ -20,9 +20,41 @@ function(GridX, declare, array, lang, html) {
             }
         },
 
+        _throttle: function(func, wait, options) {
+            var context, args, result;
+            var timeout = null;
+            var previous = 0;
+            if (!options) options = {};
+            var later = function() {
+              previous = options.leading === false ? 0 : new Date().getTime();
+              timeout = null;
+              result = func.apply(context, args);
+              if (!timeout) context = args = null;
+            };
+            return function() {
+              var now = new Date().getTime();
+              if (!previous && options.leading === false) previous = now;
+              var remaining = wait - (now - previous);
+              context = this;
+              args = arguments;
+              if (remaining <= 0 || remaining > wait) {
+                if (timeout) {
+                  clearTimeout(timeout);
+                  timeout = null;
+                }
+                previous = now;
+                result = func.apply(context, args);
+                if (!timeout) context = args = null;
+              } else if (!timeout && options.trailing !== false) {
+                timeout = setTimeout(later, remaining);
+              }
+              return result;
+            };
+          },
+
         _updateEventSource: function() {
 
-            var panel = this;
+            var that = this;
 
             if(null != this._eventSource) {
                 this._eventSource.close();
@@ -36,25 +68,27 @@ function(GridX, declare, array, lang, html) {
                 var parser = document.createElement('a');
                 parser.href = this.store.vospace.url;
 
+                var refresh = this._throttle(function(e) {
+                        that.model.clearCache();
+                        that.body.refresh();
+                    }, 3000)
+
                 dojo.xhrGet(scidrive.OAuth.sign("GET", {
-                    url: encodeURI(panel.store.vospace.url+"/updates?path="+panel.query.path),
+                    url: encodeURI(that.store.vospace.url+"/updates?path="+that.query.path),
                     handleAs: "text",
                     load: function(data){
-                        panel._eventSource = new EventSource(panel.store.vospace.url+'/updates/'+data);
-                        panel._eventSource.onmessage = function(e) {
-                            panel.plugin('selector').clear();
-                            panel._refresh(true);
-                        };
-                        panel._eventSource.onerror = function(e) {
+                        that._eventSource = new EventSource(that.store.vospace.url+'/updates/'+data);
+                        that._eventSource.onmessage = refresh;
+                        that._eventSource.onerror = function(e) {
                             console.debug(e);
-                            panel._eventSource.close();
-                            panel._eventSource = null;
+                            that._eventSource.close();
+                            that._eventSource = null;
                         };
                     },
                     error: function(data, ioargs) {
                         console.error(data);
                     }
-                }, panel.store.vospace.credentials));
+                }, that.store.vospace.credentials));
             }
         }
 

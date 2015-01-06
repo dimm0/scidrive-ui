@@ -315,6 +315,8 @@ function(declare, lang, fx, connect, coreFx, aspect, domConstruct, xhr, JSON, io
 
     request: function(url, method, args) {
         var params = this.signRequest(url, method, args);
+        console.debug(args);
+        console.debug(params);
         return xhr(url, params);
     },
 
@@ -323,7 +325,8 @@ function(declare, lang, fx, connect, coreFx, aspect, domConstruct, xhr, JSON, io
             headers: {
                 'Authorization': OAuth.sign(
                     method,
-                    {url: url},
+                    {url: url,
+                        content: (typeof args === "undefined")?undefined:args.content},
                     this.credentials)
                 .headers["Authorization"]
             }
@@ -333,6 +336,8 @@ function(declare, lang, fx, connect, coreFx, aspect, domConstruct, xhr, JSON, io
             this.mixinDeep(params, args);
 
         this.mixinDeep(params, {"method": method});
+        if(args)
+            params.query = ioQuery.objectToQuery(args.content);
         return params;
     },
 

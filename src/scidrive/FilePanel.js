@@ -6,6 +6,7 @@ define([
         "dojo/aspect",
         "dojo/_base/array",
         "dojo/on",
+        "dojo/html",
         "dojo/keys",
         "dojo/dom-construct",
         "dojo/dom-style",
@@ -40,9 +41,11 @@ define([
         "dijit/DropDownMenu",
         "dijit/InlineEditBox",
         "dijit/Toolbar",
+        "dijit/TooltipDialog",
         "dijit/ProgressBar",
         "dijit/Dialog",
         "dijit/registry",
+        "dijit/popup",
         "dojox/widget/Dialog",
         "dojo/data/ItemFileWriteStore",
         "dijit/TitlePane",
@@ -53,14 +56,18 @@ define([
         'gridx/modules/extendedSelect/Row',
         'gridx/modules/VirtualVScroller',
         'gridx/modules/Menu',
+        'gridx/modules/CellWidget',
+        'gridx/modules/dnd/Row',
+        'gridx/modules/move/Row',
+
 
         "scidrive/XMLWriter"
     ],
-    function(declare, connect, fx, Deferred, aspect, array, on, keys, domConstruct, domStyle, domAttr, Memory, WidgetBase, PaginationPlugin, DnDPlugin, SelectorPlugin,
-        MenuPlugin, DataGrid, Menu, LightBox, ConfirmDialog, MetadataViewer, TemplatedMixin, WidgetsInTemplateMixin, _ContentPaneResizeMixin, template, BorderContainer, ContentPane, _LayoutWidget,
+    function(declare, connect, fx, Deferred, aspect, array, on, html, keys, domConstruct, domStyle, domAttr, Memory, WidgetBase, PaginationPlugin, DnDPlugin, SelectorPlugin,
+        MenuPlugin, DataGrid, Menu, Lightbox, ConfirmDialog, MetadataViewer, TemplatedMixin, WidgetsInTemplateMixin, _ContentPaneResizeMixin, template, BorderContainer, ContentPane, _LayoutWidget,
         Form, Button, Select, CheckBox, ValidationTextBox, TextBox, Textarea,
-        FilteringSelect, PopupMenuBarItem, DropDownMenu, InlineEditBox, Toolbar, ProgressBar, Dialog, registry, dojox_Dialog, ItemFileWriteStore, TitlePane, Async,
-        Focus, ColumnResizer, ExtendedSelectRow, VirtualVScroller, GridMenu, XMLWriter
+        FilteringSelect, PopupMenuBarItem, DropDownMenu, InlineEditBox, Toolbar, TooltipDialog, ProgressBar, Dialog, registry, popup, dojox_Dialog, ItemFileWriteStore, TitlePane, Async,
+        Focus, ColumnResizer, ExtendedSelectRow, VirtualVScroller, GridMenu, CellWidget, DnDRow, MoveRow, XMLWriter
     ) {
         return declare([WidgetBase, _LayoutWidget, _ContentPaneResizeMixin /* These 2 make it resizing in height on window resize */ , TemplatedMixin, WidgetsInTemplateMixin], {
 
@@ -123,33 +130,6 @@ define([
 
                     this._menuItems = {};
 
-                    this._menuItems['previewMenuItem'] = new dijit.MenuItem({
-                        label: "Preview...",
-                        onClick: function(e) {
-                            panel.store.vospace.request(
-                                encodeURI(panel.store.vospace.url + "/1/media/sandbox" + panel._menuSelectedItem.i.path),
-                                "GET", {
-                                    handleAs: "json"
-                                }
-                            ).then(
-                                function(data) {
-                                    var lb = new dojox.image.Lightbox({
-                                        title: "Preview",
-                                        group: "group",
-                                        href: data.url
-                                    });
-                                    lb.startup();
-                                    setTimeout(function() {
-                                        lb.show();
-                                    }, 2000);
-                                },
-                                function(error) {
-                                    panel._handleError(error);
-                                }
-                            );
-                        }
-                    });
-                    rowMenuObject.addChild(this._menuItems['previewMenuItem']);
                     rowMenuObject.addChild(new dijit.MenuItem({
                         label: "Delete",
                         onClick: function(e) {
@@ -181,97 +161,132 @@ define([
                     });
                     rowMenuObject.addChild(this._menuItems['pullUrlMenuItem']);
 
-                    this._menuItems['mediaMenuItem'] = new dijit.MenuItem({
-                        label: "Quick Share URL...",
-                        onClick: function(e) {
-                            panel.store.vospace.request(
-                                encodeURI(panel.store.vospace.url + "/1/media/sandbox" + panel._menuSelectedItem.i.path),
-                                "GET", {
-                                    handleAs: "json"
-                                }
-                            ).then(
-                                function(data) {
-                                    var infoContent = "<div style='background: #e3e3e3; margin: 30px; padding: 5px;'><a href=\"" + data.url + "\" target=\"_blank\">" + data.url + "</a></div>";
-                                    var infoWindow = new dijit.Dialog({
-                                        title: "File URL",
-                                        autofocus: false,
-                                        content: infoContent,
-                                        style: "background-color:white;z-index:5;position:relative;",
-                                        id: "IndoWindow",
-                                        onCancel: function() {
-                                            dijit.popup.close(this);
-                                            this.destroyRecursive(false);
-                                        }
-                                    });
-                                    infoWindow.show();
-                                },
-                                function(error) {
-                                    panel._handleError(error);
-                                }
-                            );
-                        }
-                    });
-                    rowMenuObject.addChild(this._menuItems['mediaMenuItem']);
-
-                    this._menuItems['shareMenuItem'] = new dijit.MenuItem({
-                        label: "Share...",
-                        onClick: function(e) {
-                            panel.store.vospace.request(
-                                encodeURI(panel.store.vospace.url + "/1/share_groups"),
-                                "GET", {
-                                    handleAs: "json"
-                                }
-                            ).then(
-                                function(data) {
-                                    var sharesStore = new Memory({
-                                        data: data
-                                    });
-
-                                    panel.shareSelect.store = sharesStore;
-                                    connect.connect(panel.shareSelect, "onChange", function(e) {
-                                        panel.store.vospace.request(
-                                            encodeURI(panel.store.vospace.url + "/1/share_groups/" + this.item.id),
-                                            "GET", {
-                                                handleAs: "json"
-                                            }
-                                        ).then(
-                                            function(data) {
-                                                domConstruct.empty(panel.usersList);
-                                                data.forEach(function(item, num) {
-                                                    var userDiv = dojo.create("div", {
-                                                        innerHTML: item
-                                                    });
-                                                    domConstruct.place(userDiv, panel.usersList);
-                                                });
-
-                                            },
-                                            function(error) {
-                                                panel._handleError(error);
-                                            }
-                                        );
-                                    });
-
-                                    panel.chooseShareGroupDialog.startup();
-
-                                    // reset the dialog if necessary
-                                    panel.chooseShareGroupDialog.show();
-                                }
-                            );
-                        }
-                    });
-                    rowMenuObject.addChild(this._menuItems['shareMenuItem']);
-
-
                     rowMenuObject.startup();
-
+                    
                     var structure =
                             [
                                 //{ name: ' ', field: 'is_dir' , formatter: this._formatFileIcon, width: '3%'},
                                 {
                                     name: 'Name',
                                     field: 'path',
+                                    widgetsInCell: true,
+                                    allowEventBubble: true,
                                     formatter: this._getName,
-                                    width: '62%'
+                                    decorator: function(){
+                                        return "<span data-dojo-type='dijit.layout.ContentPane'  data-dojo-attach-point='cell_cont' data-dojo-props='maximum: 1' class='gridxHasGridCellValue'>"+
+                                                "<span data-dojo-attach-point='textfield'></span>"+
+                                                "<span class='quickToolbarSpan'>"+
+                                                "<button data-dojo-type='dijit.form.Button' data-dojo-attach-point='link_btn' baseClass='quickToolbarButtonBase' data-dojo-props='iconClass:\"quickToolbarButton link\", showLabel: false'>External link</button>"+
+                                                "<button data-dojo-type='dijit.form.Button' data-dojo-attach-point='share_btn' baseClass='quickToolbarButtonBase' data-dojo-props='iconClass:\"quickToolbarButton share\", showLabel: false'>Share</button>"+
+                                                "<button data-dojo-type='dijit.form.Button' data-dojo-attach-point='meta_btn' baseClass='quickToolbarButtonBase' data-dojo-props='iconClass:\"quickToolbarButton meta\", showLabel: false'>Metadata</button>"+
+                                                "<button data-dojo-type='dijit.form.Button' data-dojo-attach-point='preview_btn' baseClass='quickToolbarButtonBase' data-dojo-props='iconClass:\"quickToolbarButton preview\", showLabel: false'>Preview</button>"+
+                                                "<button data-dojo-type='dijit.form.Button' data-dojo-attach-point='download_btn' baseClass='quickToolbarButtonBase' data-dojo-props='iconClass:\"quickToolbarButton download\", showLabel: false'>Download</button>"+
+                                                "</span></span>";
+                                    },
+                                    setCellValue: function(gridData, storeData, cellWidget){
+                                        html.set(cellWidget.textfield, gridData);
+                                        var data = cellWidget.cell.row.rawData();
+                                        if((data.mime_type + "").indexOf("image") < 0)
+                                            domStyle.set(cellWidget.preview_btn.domNode, 'display', 'none');
+                                        else
+                                            domStyle.set(cellWidget.preview_btn.domNode, 'display', 'inline');
+
+                                        if(panel.gridWidget._currentPath == '/')
+                                            domStyle.set(cellWidget.share_btn.domNode, 'display', 'inline');
+                                        else
+                                            domStyle.set(cellWidget.share_btn.domNode, 'display', 'none');
+                                    },
+                                    getCellWidgetConnects: function(cellWidget, cell){
+                                        return [
+                                          [cellWidget.link_btn, 'onMouseDown', function(e){
+
+
+                                            panel.store.vospace.request(
+                                                encodeURI(panel.store.vospace.url + "/1/media/sandbox" + cell.row.id),
+                                                "GET", {
+                                                    handleAs: "json"
+                                                }
+                                            ).then(
+                                                function(data) {
+                                                    var myTooltipDialog = new TooltipDialog({
+                                                        content: "<a href=\"" + data.url + "\" target=\"_blank\">" + data.url + "</a>",
+                                                        onMouseLeave: function(){
+                                                            this._timer = setTimeout(dojo.partial(function(){
+                                                                popup.close(myTooltipDialog);
+                                                                myTooltipDialog.destroyRecursive();
+                                                            }, this.id), 2000);
+                                                        },
+                                                        onMouseEnter: function(){
+                                                            clearTimeout(this._timer);
+                                                        }
+                                                    });
+
+                                                    popup.open({
+                                                        popup: myTooltipDialog,
+                                                        around: cell.node()
+                                                    });
+                                                },
+                                                function(error) {
+                                                    panel._handleError(error);
+                                                }
+                                            );
+
+                                            e.stopPropagation();
+                                          }],
+                                          [cellWidget.meta_btn, 'onMouseDown', function(e){
+                                            panel._showMetadata(cell.row.id);
+                                            e.stopPropagation();
+                                          }],
+                                          [cellWidget.preview_btn, 'onMouseDown', function(e){
+                                            panel.store.vospace.request(
+                                                encodeURI(panel.store.vospace.url + "/1/media/sandbox" + cell.row.id),
+                                                "GET", {
+                                                    handleAs: "json"
+                                                }
+                                            ).then(
+                                                function(data) {
+                                                    console.debug(data.url);
+                                                    var lb = new dojox.image.LightboxDialog({
+                                                        hide: function() {
+                                                            console.debug("DEstroy");
+                                                            this.destroyRecursive();
+                                                        }
+                                                    }).startup();
+                                                    setTimeout(function() {
+                                                        lb.show({ title:cell.row.id, href: data.url });
+                                                    }, 2000);
+                                                },
+                                                function(error) {
+                                                    panel._handleError(error);
+                                                }
+                                            );
+                                            e.stopPropagation();
+                                          }],
+                                          [cellWidget.download_btn, 'onMouseDown', function(e){
+                                            panel.store.vospace.request(
+                                                encodeURI(panel.store.vospace.url + "/1/media/sandbox" + cell.row.id),
+                                                "GET", {
+                                                    handleAs: "json"
+                                                }
+                                            ).then(
+                                                function(data) {
+                                                    require(["dojo/request/iframe"], function(iframe) {
+                                                        iframe(data.url, {
+                                                            method: "GET"
+                                                        }).then(function(err) {
+                                                            console.debug(err);
+                                                        }).cancel();
+                                                    });
+                                                },
+                                                function(error) {
+                                                    panel._handleError(error);
+                                                }
+                                            );
+
+                                          }]
+                                        ];
+                                    },
+                                    width: '60%'
                                 }, {
                                     name: 'Size',
                                     field: 'size',
@@ -295,28 +310,15 @@ define([
                         modules: [
                             Focus,
                             ColumnResizer,
-                            ExtendedSelectRow,
                             VirtualVScroller,
-                            GridMenu
+                            GridMenu,
+                            CellWidget,
+                            ExtendedSelectRow,
+                            DnDRow,
+                            MoveRow
                         ],
-                        // plugins: {
-                        //     dnd: {
-                        //         'dndConfig': {
-                        //             'out': {
-                        //                 col: false,
-                        //                 row: true,
-                        //                 cell: false
-                        //             },
-                        //             'in': {
-                        //                 col: false,
-                        //                 row: true,
-                        //                 cell: false
-                        //             },
-                        //             'within': false
-                        //         }
-                        //     },
-                        // },
                         selectRowTriggerOnCell: true,
+                        dndRowCanRearrange: false,
                         query: {
                             list: 'true',
                             path: "/"
@@ -350,7 +352,9 @@ define([
                             }
                         }
                     }, this.grid);
-                    // connect.connect(this.gridWidget.plugin('dnd'), "onDragIn", this, "_dragIn");
+                    //connect.connect(this.gridWidget.plugin('dnd'), "onDragIn", this, "_dragIn");
+
+                    console.debug(this.gridWidget.modules.DnDRow);
 
                     connect.connect(this.gridWidget, "dokeypress", this, function(e) {
                         if (e.keyCode == keys.DELETE) { // press delete on grid
@@ -472,13 +476,21 @@ define([
             _getName: function(row, path) {
                 var pathTokens = path.split('/');
 
+                var len = 70;
+                var name = pathTokens[pathTokens.length - 1];
+                if (name && name.length > len) {
+                    name = "<span title='" + name + "'>" + name.substring(0, len) + "...</span>";
+                }
                 switch (row.icon) {
                     case "folder_public":
-                        return "<img src='scidrive/resources/folder.jpg' style='vertical-align:middle' title='Folder' alt='Folder' width='20'/>&nbsp;" + pathTokens[pathTokens.length - 1];
+                        return "<i class=\"fa fa-folder-o\" style=\"color: rgb(50,110,183)\"></i>&nbsp;" + name;
                     case "file":
-                        return "<img src='scidrive/resources/file.png' style='vertical-align:middle' title='File' alt='File' width='20'/>&nbsp;" + pathTokens[pathTokens.length - 1];
+                        if(row.mime_type.indexOf("image") == 0)
+                            return "<i class=\"fa fa-file-image-o\" style=\"color: rgb(50,110,183)\"></i>&nbsp;" + name;
+                        else
+                            return "<i class=\"fa fa-file-o\" style=\"color: rgb(50,110,183)\"></i>&nbsp;" + name;
                     case "table":
-                        return "<img src='scidrive/resources/table.png' style='vertical-align:middle' title='File' alt='File' width='20'/>&nbsp;" + pathTokens[pathTokens.length - 1];
+                        return "<i class=\"fa fa-table\" style=\"color: rgb(50,110,183)\"></i>&nbsp;" + name;
                 }
             },
 
@@ -511,7 +523,9 @@ define([
                             content: meta_form,
                             onCancel: function() {
                                 dijit.popup.close(this);
-                                this.destroyRecursive(false);
+                            },
+                            onHide: function() {
+                                this.destroyRecursive();
                             }
                         });
 

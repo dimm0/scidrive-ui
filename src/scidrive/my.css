@@ -8,6 +8,7 @@
 @import "../dojox/mobile/themes/iphone/Switch.css";
 @import "../dojox/form/resources/CheckedMultiSelect.css";
 @import "../gridx/resources/claro/Gridx.css";
+@import "resources/font-awesome-4.2.0/css/font-awesome.min.css";
 
 html, body {
 	width: 100%;
@@ -70,17 +71,22 @@ html, body {
 	border-bottom: none;
 }
 
-.scidrive .dojoxGrid {
-	font-family: inherit;
-	font-size: 1em;
-	background-color: white;
-	/*border-right: 2px solid #e7e8e9;*/
-	-webkit-user-select: none;
-	user-select: none;
+/*Border around the header*/
+.scidrive .gridxHeader .gridxHeaderRowInner, .scidrive .gridxHeader .gridxHeaderRow {
+	border:none;
 }
 
+/*Single cell selection*/
+.scidrive .gridx .gridxBody .gridxCellFocus {
+	border-bottom: none !important;
+	border-top: none !important;
+	border-left: 2px solid #e7e8e9 !important;
+	border-right: none !important;
+}
+
+
 /* Grid header img */
-.scidrive .dojoxGridHeader .dojoxGridCell {
+.scidrive .gridxHeader .gridxHeaderRowInner .gridxCell {
 	background: url("resources/interface/tabEnabled.png") repeat-x scroll center top #E9E9E9;
 	color: #58595b !important;
 	border-left: 2px solid white !important;
@@ -89,24 +95,23 @@ html, body {
 	border-right: none;
 }
 
-/* Regular grid cell text font */
-.scidrive .dojoxGridCell, .scidrive .dojoxGridCellFocus, .dojoxGridCellFocus {
+.scidrive .gridxRowTable .gridxCell {
 	color: #414141;
 	border-bottom: none;
 	border-top: none;
 	border-left: 2px solid #e7e8e9;
 	border-right: none;
+	height: 24px;
+}
+
+.scidrive .gridx {
+	border: 1px white;
 }
 
 /* Remove lines on the left of grid */
 .scidrive .dojoxGridRowbarInner {
 	width: 0px;
 	border: none;
-}
-
-/* All cells white */
-.scidrive .dojoxGridRowOdd {
-	background-color: white;
 }
 
 /* No label in orange progress bar */
@@ -162,6 +167,33 @@ html, body {
 	width: 48px;
 	height: 40px;
 	text-align: center;
+}
+
+.quickToolbarButton {
+	background-repeat: no-repeat;
+	background-size:22px 22px;
+	width: 22px;
+	height: 22px;
+	text-align: center;
+}
+
+.quickToolbarButtonBase .dijitButtonNode {
+	border: none;
+	background: none;
+	padding: 0px;
+}
+
+.quickToolbarSpan {
+	position: relative;
+	float: right;
+	display: none;
+	top: 0;
+	z-index: 5;
+	overflow: visible;
+}
+
+.gridxRowOver .quickToolbarSpan {
+	display: block;
 }
 
 /* text button padding remove */
@@ -258,6 +290,36 @@ html, body {
 .casjobsToolbarButton {background-image: url(resources/interface/sdss3_logo.png)}
 .secpanToolbarButton {background-image: url(resources/interface/2nd_pan_btn.gif)}
 .jobsToolbarButton {background-image: url(resources/interface/jobs_btn.png)}
+
+span.share:before {
+	content: "\f1e0";
+	font-family: FontAwesome;
+	color: rgb(50,110,183);
+}
+
+span.meta:before {
+	content: "\f05a";
+	font-family: FontAwesome;
+	color: rgb(50,110,183);
+}
+
+span.link:before {
+	content: "\f08e";
+	font-family: FontAwesome;
+	color: rgb(50,110,183);
+}
+
+span.preview:before {
+	content: "\f06e";
+	font-family: FontAwesome;
+	color: rgb(50,110,183);
+}
+
+span.download:before {
+	content: "\f019";
+	font-family: FontAwesome;
+	color: rgb(50,110,183);
+}
 
 .ConfirmDialog .dijitDialogPaneContentArea {
   margin: -10px -8px;
