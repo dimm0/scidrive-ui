@@ -35,13 +35,12 @@ define([
   "scidrive/NewFilePanel",
   "scidrive/NewDirPanel",
   "scidrive/AccountSettings",
-  "numeral/numeral",
   "dojox/grid/DataGrid",
   "dojo/text!./templates/ScidrivePanel.html"
   ],
   function(declare, array, lang, query, domStyle, domConstruct, keys, on, Toggler, coreFx, ItemFileWriteStore, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin,
     BorderContainer, TabContainer, ContentPane, Toolbar, Tooltip, ProgressBar, Button, Select, MultiSelect, ToggleButton, TextBox, CheckBox, Dialog, TableContainer,
-    FilePanel, DataGrid, VosyncReadStore, JobsManager, DynamicPropertiesForm, NewFilePanel, NewDirPanel, AccountSettings, numeral, DojoDataGrid, template) {
+    FilePanel, DataGrid, VosyncReadStore, JobsManager, DynamicPropertiesForm, NewFilePanel, NewDirPanel, AccountSettings, DojoDataGrid, template) {
     return declare([WidgetBase, TemplatedMixin, WidgetsInTemplateMixin], {
         templateString: template,
 
@@ -295,8 +294,8 @@ define([
                   progress: accountInfo.quota_info.normal
                 });
 
-                var tooltipText = numeral(accountInfo.quota_info.normal).format('0.0 b')+
-                " of "+numeral(accountInfo.quota_info.quota).format('0.0 b')+" used";
+                var tooltipText = accountInfo.quota_info.normal.fileSize(1)+
+                " of "+accountInfo.quota_info.quota.fileSize(1)+" used";
                 panel.userLimitTooltip.set("label", tooltipText);
                 dijit.Tooltip.defaultPosition=['below-centered'];
                 panel.userLimitTooltip.set("connectId",panel.userLimitBar.id);

@@ -12,10 +12,6 @@ define([
         "dojo/dom-attr",
         "dojo/store/Memory",
         "dijit/_WidgetBase",
-        "dojox/grid/enhanced/plugins/Pagination",
-        "dojox/grid/enhanced/plugins/DnD",
-        "dojox/grid/enhanced/plugins/Selector",
-        "dojox/grid/enhanced/plugins/Menu",
         "scidrive/DataGrid",
         "dijit/Menu",
         "dojox/image/Lightbox",
@@ -48,8 +44,8 @@ define([
         "dijit/TitlePane",
         "scidrive/XMLWriter"
     ],
-    function(declare, connect, fx, Deferred, aspect, array, on, keys, domConstruct, domStyle, domAttr, Memory, WidgetBase, PaginationPlugin, DnDPlugin, SelectorPlugin,
-        MenuPlugin, DataGrid, Menu, LightBox, ConfirmDialog, MetadataViewer, TemplatedMixin, WidgetsInTemplateMixin, _ContentPaneResizeMixin, template, BorderContainer, ContentPane, _LayoutWidget,
+    function(declare, connect, fx, Deferred, aspect, array, on, keys, domConstruct, domStyle, domAttr, Memory, WidgetBase,
+        DataGrid, Menu, LightBox, ConfirmDialog, MetadataViewer, TemplatedMixin, WidgetsInTemplateMixin, _ContentPaneResizeMixin, template, BorderContainer, ContentPane, _LayoutWidget,
         Form, Button, Select, CheckBox, ValidationTextBox, TextBox, Textarea,
         FilteringSelect, PopupMenuBarItem, DropDownMenu, InlineEditBox, Toolbar, ProgressBar, Dialog, registry, dojox_Dialog, ItemFileWriteStore, TitlePane, XMLWriter
     ) {

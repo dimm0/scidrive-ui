@@ -27,6 +27,13 @@ function(declare, lang, fx, connect, coreFx, aspect, domConstruct, xhr, JSON, io
         constructor: function(args) {
             declare.safeMixin(this, args);
 
+            /* console.log((186457865).fileSize()); */
+            Object.defineProperty(Number.prototype,'fileSize',{value:function(a,b,c,d){
+             return (a=a?[1e3,'k','B']:[1024,'K','iB'],b=Math,c=b.log,
+             d=c(this)/c(a[0])|0,this/b.pow(a[0],d)).toFixed(2)
+             +' '+(d?(a[1]+'MGTPEZY')[--d]+a[2]:'Bytes');
+            },writable:false,enumerable:false});
+
             if(has("ie")<= 8){
                 require(["scidrive/killie"], function(killie) {
                     var kie = new killie();

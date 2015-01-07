@@ -44,10 +44,10 @@ function(declare, lang, fx, connect, coreFx, aspect, domConstruct, xhr, JSON, io
             if(this.credentials.stage == "request") { // contains request token
                 this.login2(null);
             } else if(this.credentials.stage == "access") {
-                require(["scidrive/ScidrivePanel", "scidrive/ScidriveChooserPanel"], function(SciDrivePanel, SciDriveChooserPanel){
+                var module = (that.isChooser)?'ScidriveChooserPanel':'ScidrivePanel';
+                require(["scidrive/"+module], function(SciDrivePanel){
                     if("undefined" === typeof (dijit.byId("scidriveWidget"))) {
-                        var obj = (that.isChooser)?SciDriveChooserPanel:SciDrivePanel;
-                        var pan = new obj({
+                        var pan = new SciDrivePanel({
                             id: "scidriveWidget",
                             style: "width: 100%; height: 100%; opacity: 0;",
                             app: that
@@ -315,8 +315,6 @@ function(declare, lang, fx, connect, coreFx, aspect, domConstruct, xhr, JSON, io
 
     request: function(url, method, args) {
         var params = this.signRequest(url, method, args);
-        console.debug(args);
-        console.debug(params);
         return xhr(url, params);
     },
 

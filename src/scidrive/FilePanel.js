@@ -13,10 +13,6 @@ define([
         "dojo/dom-attr",
         "dojo/store/Memory",
         "dijit/_WidgetBase",
-        "dojox/grid/enhanced/plugins/Pagination",
-        "dojox/grid/enhanced/plugins/DnD",
-        "dojox/grid/enhanced/plugins/Selector",
-        "dojox/grid/enhanced/plugins/Menu",
         "scidrive/DataGrid",
         "dijit/Menu",
         "dojox/image/Lightbox",
@@ -63,8 +59,8 @@ define([
 
         "scidrive/XMLWriter"
     ],
-    function(declare, connect, fx, Deferred, aspect, array, on, html, keys, domConstruct, domStyle, domAttr, Memory, WidgetBase, PaginationPlugin, DnDPlugin, SelectorPlugin,
-        MenuPlugin, DataGrid, Menu, Lightbox, ConfirmDialog, MetadataViewer, TemplatedMixin, WidgetsInTemplateMixin, _ContentPaneResizeMixin, template, BorderContainer, ContentPane, _LayoutWidget,
+    function(declare, connect, fx, Deferred, aspect, array, on, html, keys, domConstruct, domStyle, domAttr, Memory, WidgetBase,
+        DataGrid, Menu, Lightbox, ConfirmDialog, MetadataViewer, TemplatedMixin, WidgetsInTemplateMixin, _ContentPaneResizeMixin, template, BorderContainer, ContentPane, _LayoutWidget,
         Form, Button, Select, CheckBox, ValidationTextBox, TextBox, Textarea,
         FilteringSelect, PopupMenuBarItem, DropDownMenu, InlineEditBox, Toolbar, TooltipDialog, ProgressBar, Dialog, registry, popup, dojox_Dialog, ItemFileWriteStore, TitlePane, Async,
         Focus, ColumnResizer, ExtendedSelectRow, VirtualVScroller, GridMenu, CellWidget, DnDRow, MoveRow, XMLWriter
@@ -353,8 +349,6 @@ define([
                         }
                     }, this.grid);
                     //connect.connect(this.gridWidget.plugin('dnd'), "onDragIn", this, "_dragIn");
-
-                    console.debug(this.gridWidget.modules.DnDRow);
 
                     connect.connect(this.gridWidget, "dokeypress", this, function(e) {
                         if (e.keyCode == keys.DELETE) { // press delete on grid

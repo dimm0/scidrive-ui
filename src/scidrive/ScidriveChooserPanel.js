@@ -30,13 +30,12 @@ define([
   "scidrive/ChooserFilePanel",
   "scidrive/DataGrid",
   "scidrive/VosyncReadStore",
-  "numeral/numeral",
   "dojox/grid/DataGrid",
   "dojo/text!./templates/ScidriveChooserPanel.html"
   ],
   function(declare, array, lang, query, domStyle, domConstruct, keys, on, Toggler, coreFx, ItemFileWriteStore, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin,
     BorderContainer, TabContainer, ContentPane, Toolbar, Tooltip, ProgressBar, Button, Select, MultiSelect, ToggleButton, TextBox, CheckBox, Dialog, TableContainer,
-    FilePanel, DataGrid, VosyncReadStore, numeral, DojoDataGrid, template) {
+    FilePanel, DataGrid, VosyncReadStore, DojoDataGrid, template) {
     return declare([WidgetBase, TemplatedMixin, WidgetsInTemplateMixin], {
         templateString: template,
 

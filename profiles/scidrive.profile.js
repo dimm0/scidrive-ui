@@ -73,8 +73,22 @@ var profile = {
 		},
 		'scidrive/ScidrivePanel': {},
 		'scidrive/SciDrive': {},
-		'scidrive_chooser/ScidrivePanel': {},
-		'scidrive_chooser/SciDrive': {}
+		'scidrive/ScidriveChooserPanel': {},
+		'scidrive/SciDriveChooser': {},
+		'gridx/gridx': {
+		    include: [
+			'gridx/Grid',
+			'gridx/core/model/cache/Async',
+			'gridx/modules/Focus',
+			'gridx/modules/ColumnResizer',
+			'gridx/modules/extendedSelect/Row',
+			'gridx/modules/VirtualVScroller',
+			'gridx/modules/Menu',
+			'gridx/modules/CellWidget',
+			'gridx/modules/dnd/Row',
+			'gridx/modules/move/Row'
+		    ]
+		}
 	},
 
 	// Providing hints to the build system allows code to be conditionally removed on a more granular level than

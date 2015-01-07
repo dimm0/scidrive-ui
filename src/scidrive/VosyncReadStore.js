@@ -44,7 +44,6 @@ define(["dojox/data/QueryReadStore", "dojo/_base/declare", "dojo/json", "dojo/re
 				fetchHandler(this._items, request, this._numRows);
 			}else{
 				var fullUrl = this.vospace.url+"/1/metadata/sandbox"+((request.query.path+"" != "")?request.query.path:"");
-				console.debug(serverQuery);
 				var xhrHandler = this.vospace.request(fullUrl, this.requestMethod.toUpperCase(), 
 					{
 						handleAs:"json", 

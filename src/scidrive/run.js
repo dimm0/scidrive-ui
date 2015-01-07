@@ -5,7 +5,6 @@ require({
 		'dijit',
 		'dojox',
 		'gridx',
-		{ name: 'scidrive', location: 'scidrive', map: {} },
-		{ name: 'numeral', location: 'numeral', map: {} }
+		{ name: 'scidrive', location: 'scidrive', map: {} }
 	]
 }, [ 'scidrive' ]);

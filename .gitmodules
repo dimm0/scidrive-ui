@@ -7,9 +7,6 @@
 [submodule "src/dijit"]
 	path = src/dijit
 	url = git://github.com/dojo/dijit.git
-[submodule "src/numeral"]
-	path = src/numeral
-	url = git://github.com/adamwdraper/Numeral-js.git
 [submodule "src/util"]
 	path = src/util
 	url = git://github.com/dojo/util.git
