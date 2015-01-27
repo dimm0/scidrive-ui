@@ -321,6 +321,12 @@ span.download:before {
 	color: rgb(50,110,183);
 }
 
+span.delete:before {
+	content: "\f1f8";
+	font-family: FontAwesome;
+	color: rgb(50,110,183);
+}
+
 .ConfirmDialog .dijitDialogPaneContentArea {
   margin: -10px -8px;
   padding: 10px 8px;

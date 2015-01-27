@@ -70,8 +70,6 @@ define([
             templateString: template,
             store: null,
             gridWidget: null,
-            _menuItems: null,
-            _menuSelectedItem: null,
 
             _uploadFilesQueue: null,
             _isUploading: false,
@@ -90,75 +88,6 @@ define([
                     var panel = this; // to keep context
 
                     this._createUploader();
-
-                    var rowMenuObject = new Menu();
-
-                    rowMenuObject.addChild(new dijit.MenuItem({
-                        label: "Download",
-                        onClick: function(e) {
-                            panel.store.vospace.request(
-                                encodeURI(panel.store.vospace.url + "/1/media/sandbox" + panel._menuSelectedItem.i.path),
-                                "GET", {
-                                    handleAs: "json"
-                                }
-                            ).then(
-                                function(data) {
-                                    require(["dojo/request/iframe"], function(iframe) {
-                                        iframe(data.url, {
-                                            method: "GET"
-                                        }).then(function(err) {
-                                            console.debug(err);
-                                        }).cancel();
-                                    });
-                                },
-                                function(error) {
-                                    panel._handleError(error);
-                                }
-                            );
-                        }
-                    }));
-                    rowMenuObject.addChild(new dijit.MenuItem({
-                        label: "Metadata...",
-                        onClick: function(e) {
-                            panel._showMetadata(panel._menuSelectedItem.i.path);
-                        }
-                    }));
-
-                    this._menuItems = {};
-
-                    rowMenuObject.addChild(new dijit.MenuItem({
-                        label: "Delete",
-                        onClick: function(e) {
-                            var selectedItems = panel.gridWidget.select.row.getSelected();
-
-                            if (selectedItems != undefined) {
-                                var selected = selectedItems.filter(function(val) {
-                                    return val == panel._menuSelectedItem;
-                                });
-
-                                if (selected.length > 0) {
-                                    panel._deleteSelection(selectedItems);
-                                } else {
-                                    panel._deleteSelection(panel._menuSelectedItem);
-                                }
-                            } else { // nothing is selected
-                                panel._deleteSelection(panel._menuSelectedItem);
-                            }
-                        }
-                    }));
-                    this._menuItems['pullUrlMenuItem'] = new dijit.MenuItem({
-                        label: "Pull from URL...",
-                        tooltip: "Pull data from URL to the selected item",
-                        onClick: function(e) {
-                            panel.transferNode.value = panel._menuSelectedItem.i.path;
-                            panel.urlInput.reset();
-                            panel.transferUrlDialog.show();
-                        }
-                    });
-                    rowMenuObject.addChild(this._menuItems['pullUrlMenuItem']);
-
-                    rowMenuObject.startup();
-                    
                     var structure =
                             [
                                 //{ name: ' ', field: 'is_dir' , formatter: this._formatFileIcon, width: '3%'},
@@ -177,6 +106,7 @@ define([
                                                 "<button data-dojo-type='dijit.form.Button' data-dojo-attach-point='meta_btn' baseClass='quickToolbarButtonBase' data-dojo-props='iconClass:\"quickToolbarButton meta\", showLabel: false'>Metadata</button>"+
                                                 "<button data-dojo-type='dijit.form.Button' data-dojo-attach-point='preview_btn' baseClass='quickToolbarButtonBase' data-dojo-props='iconClass:\"quickToolbarButton preview\", showLabel: false'>Preview</button>"+
                                                 "<button data-dojo-type='dijit.form.Button' data-dojo-attach-point='download_btn' baseClass='quickToolbarButtonBase' data-dojo-props='iconClass:\"quickToolbarButton download\", showLabel: false'>Download</button>"+
+                                                "<button data-dojo-type='dijit.form.Button' data-dojo-attach-point='delete_btn' baseClass='quickToolbarButtonBase' data-dojo-props='iconClass:\"quickToolbarButton delete\", showLabel: false'>Delete</button>"+
                                                 "</span></span>";
                                     },
                                     setCellValue: function(gridData, storeData, cellWidget){
@@ -191,6 +121,12 @@ define([
                                             domStyle.set(cellWidget.share_btn.domNode, 'display', 'inline');
                                         else
                                             domStyle.set(cellWidget.share_btn.domNode, 'display', 'none');
+
+                                        if(!panel.store.vospace.isShare) {
+                                            domStyle.set(cellWidget.share_btn.domNode, 'display', 'inline');
+                                        } else {
+                                            domStyle.set(cellWidget.share_btn.domNode, 'display', 'none');
+                                        }
                                     },
                                     getCellWidgetConnects: function(cellWidget, cell){
                                         return [
@@ -232,6 +168,22 @@ define([
                                           [cellWidget.meta_btn, 'onMouseDown', function(e){
                                             panel._showMetadata(cell.row.id);
                                             e.stopPropagation();
+                                          }],
+                                          [cellWidget.delete_btn, 'onMouseDown', function(e){
+                                            var selectedItems = panel.gridWidget.select.row.getSelected();
+                                            if (typeof selectedItems !== "undefined") {
+                                                var selected = selectedItems.filter(function(val) {
+                                                    return val == cell.row.id;
+                                                });
+                                                if(selected.length > 0){
+                                                    panel._deleteSelection(selectedItems);
+                                                } else {
+                                                    panel._deleteSelection(cell.row.id);
+                                                }
+                                            } else { // nothing is selected
+                                                panel._deleteSelection(cell.row.id);
+                                            }
+                                            panel.gridWidget.select.row.clear();
                                           }],
                                           [cellWidget.preview_btn, 'onMouseDown', function(e){
                                             panel.store.vospace.request(
@@ -279,6 +231,48 @@ define([
                                                 }
                                             );
 
+                                          }],
+                                          [cellWidget.share_btn, 'onMouseDown', function(e) {
+                                            panel.store.vospace.request(
+                                                encodeURI(panel.store.vospace.url + "/1/share_groups"),
+                                                "GET", {
+                                                    handleAs: "json"
+                                                }
+                                            ).then(
+                                                function(data) {
+                                                    var sharesStore = new Memory({data: data});
+
+                                                    panel.shareSelect.store = sharesStore;
+                                                    connect.connect(panel.shareSelect, "onChange", function(e) {
+                                                        panel.store.vospace.request(
+                                                            encodeURI(panel.store.vospace.url + "/1/share_groups/" + cell.row.id),
+                                                            "GET", {
+                                                                handleAs: "json"
+                                                            }
+                                                        ).then(
+                                                            function(data) {
+                                                                domConstruct.empty(panel.usersList);
+                                                                data.forEach(function(item, num) {
+                                                                    var userDiv = dojo.create("div", {
+                                                                        innerHTML: item
+                                                                    });
+                                                                    domConstruct.place(userDiv, panel.usersList);
+                                                                });
+
+                                                            },
+                                                            function(error) {
+                                                                panel._handleError(error);
+                                                            }
+                                                        );
+                                                    });
+
+                                                    panel.chooseShareGroupDialog.nodepath = cell.row.id;
+                                                    panel.chooseShareGroupDialog.startup();
+
+                                                    // reset the dialog if necessary
+                                                    panel.chooseShareGroupDialog.show();
+                                                }
+                                            );
                                           }]
                                         ];
                                     },
@@ -307,7 +301,6 @@ define([
                             Focus,
                             ColumnResizer,
                             VirtualVScroller,
-                            GridMenu,
                             CellWidget,
                             ExtendedSelectRow,
                             DnDRow,
@@ -356,9 +349,6 @@ define([
                             panel._deleteSelection(selectedItems);
                         }
                     });
-
-                    this.gridWidget.menu.bind(rowMenuObject, {hookPoint: "row"});
-                    connect.connect(this.gridWidget, "onRowContextMenu", this, "_rowcontextmenu");
 
                     on(this, "click", function(e) {
                         this.parentPanel.updateCurrentPanel(this);
@@ -418,12 +408,9 @@ define([
                     message: "Delete files?"
                 }).then(function() {
                     if (path instanceof Array) {
-                        var filesToDelete = path.map(function(item){
-                            return item.i.path;
-                        });
-                        for (var i = 0; i < filesToDelete.length; i++) {
+                        for (var i = 0; i < path.length; i++) {
                             panel.store.vospace.request(
-                                encodeURI(panel.store.vospace.url + "/nodes" + filesToDelete[i]),
+                                encodeURI(panel.store.vospace.url + "/nodes" + path[i]),
                                 "DELETE", {
                                     handleAs: "text"
                                 }
@@ -439,7 +426,7 @@ define([
 
                     } else {
                         panel.store.vospace.request(
-                            encodeURI(panel.store.vospace.url + "/nodes" + path.i.path),
+                            encodeURI(panel.store.vospace.url + "/nodes" + path),
                             "DELETE", {
                                 handleAs: "text"
                             }
@@ -696,7 +683,7 @@ define([
                 params += "write_perm=" + !this.readOnlyCheckBox.checked;
 
                 panel.store.vospace.request(
-                    encodeURI(panel.store.vospace.url + "/1/shares/sandbox" + panel._menuSelectedItem.i.path + params),
+                    encodeURI(panel.store.vospace.url + "/1/shares/sandbox" + this.chooseShareGroupDialog.nodepath + params),
                     "PUT", {
                         handleAs: "json"
                     }
@@ -722,29 +709,6 @@ define([
                         panel._handleError(error);
                     }
                 );
-            },
-
-            _rowcontextmenu: function(e) {
-                this._menuSelectedItem = this.gridWidget.row(e.rowId).item();
-
-                if (this._menuSelectedItem.i.mime_type && this._menuSelectedItem.i.mime_type.indexOf("image") == 0) {
-                    this._menuItems["previewMenuItem"].set("disabled", false);
-                } else {
-                    this._menuItems["previewMenuItem"].set("disabled", true);
-                }
-
-                if (!this._menuSelectedItem.i.mime_type) { // folder
-                    this._menuItems["pullUrlMenuItem"].set("disabled", true);
-                } else {
-                    this._menuItems["pullUrlMenuItem"].set("disabled", false);
-                }
-
-                if (!this.store.vospace.isShare && this.gridWidget._currentPath == '/') { // root
-                    this._menuItems["shareMenuItem"].set("disabled", false);
-                } else {
-                    this._menuItems["shareMenuItem"].set("disabled", true);
-                }
-
             },
 
             _enableShareGroup: function(e) {

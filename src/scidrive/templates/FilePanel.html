@@ -24,6 +24,7 @@
 
 		<!-- Choose group dialog -->
 		<div data-dojo-type="dijit/Dialog" data-dojo-attach-point="chooseShareGroupDialog" title="Choose group for sharing" data-dojo-attach-event="execute: _createShare" data-dojo-props="class:'dialog'">
+			<input type="hidden" data-dojo-attach-point="nodepath" value=""/>
 			<div style="margin:0px auto; width: 450px;">
 				<div>
 					<input type="radio" name="groupEnable" checked value="off" data-dojo-attach-event="onclick:_disableShareGroup"/><label> No group: anonymous access</label>
