@@ -188,8 +188,9 @@ html, body {
 	float: right;
 	display: none;
 	top: 0;
-	z-index: 5;
+	z-index: 10;
 	overflow: visible;
+	background-color: rgba(206,232,242,0.9);
 }
 
 .gridxRowOver .quickToolbarSpan {

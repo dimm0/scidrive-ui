@@ -98,9 +98,9 @@ define([
                                     allowEventBubble: true,
                                     formatter: this._getName,
                                     decorator: function(){
-                                        return "<span data-dojo-type='dijit.layout.ContentPane'  data-dojo-attach-point='cell_cont' data-dojo-props='maximum: 1' class='gridxHasGridCellValue'>"+
-                                                "<span data-dojo-attach-point='textfield'></span>"+
-                                                "<span class='quickToolbarSpan'>"+
+                                        return "<span data-dojo-type='dijit.layout.ContentPane' style='position: relative; overflow: hidden;' data-dojo-attach-point='cell_cont' data-dojo-props='maximum: 1' class='gridxHasGridCellValue'>"+
+                                                "<span data-dojo-attach-point='textfield' style='width: 100%; white-space:nowrap; overflow: hidden'></span>"+
+                                                "<span class='quickToolbarSpan' style='position:absolute; right: 0px;'>"+
                                                 "<button data-dojo-type='dijit.form.Button' data-dojo-attach-point='link_btn' baseClass='quickToolbarButtonBase' data-dojo-props='iconClass:\"quickToolbarButton link\", showLabel: false'>External link</button>"+
                                                 "<button data-dojo-type='dijit.form.Button' data-dojo-attach-point='share_btn' baseClass='quickToolbarButtonBase' data-dojo-props='iconClass:\"quickToolbarButton share\", showLabel: false'>Share</button>"+
                                                 "<button data-dojo-type='dijit.form.Button' data-dojo-attach-point='meta_btn' baseClass='quickToolbarButtonBase' data-dojo-props='iconClass:\"quickToolbarButton meta\", showLabel: false'>Metadata</button>"+
@@ -457,21 +457,29 @@ define([
             _getName: function(row, path) {
                 var pathTokens = path.split('/');
 
+                var icon = "";
+                switch (row.icon) {
+                    case "folder_public":
+                        icon = "<i class=\"fa fa-folder-o\" style=\"color: rgb(50,110,183)\"></i>&nbsp;";
+                        break;
+                    case "file":
+                        if(row.mime_type.indexOf("image") == 0)
+                            icon = "<i class=\"fa fa-file-image-o\" style=\"color: rgb(50,110,183)\"></i>&nbsp;";
+                        else
+                            icon = "<i class=\"fa fa-file-o\" style=\"color: rgb(50,110,183)\"></i>&nbsp;";
+                        break;
+                    case "table":
+                        icon = "<i class=\"fa fa-table\" style=\"color: rgb(50,110,183)\"></i>&nbsp;";
+                        break;
+                }
+
+
                 var len = 70;
                 var name = pathTokens[pathTokens.length - 1];
                 if (name && name.length > len) {
-                    name = "<span title='" + name + "'>" + name.substring(0, len) + "...</span>";
-                }
-                switch (row.icon) {
-                    case "folder_public":
-                        return "<i class=\"fa fa-folder-o\" style=\"color: rgb(50,110,183)\"></i>&nbsp;" + name;
-                    case "file":
-                        if(row.mime_type.indexOf("image") == 0)
-                            return "<i class=\"fa fa-file-image-o\" style=\"color: rgb(50,110,183)\"></i>&nbsp;" + name;
-                        else
-                            return "<i class=\"fa fa-file-o\" style=\"color: rgb(50,110,183)\"></i>&nbsp;" + name;
-                    case "table":
-                        return "<i class=\"fa fa-table\" style=\"color: rgb(50,110,183)\"></i>&nbsp;" + name;
+                    return "<span title='" + name + "'>" + icon + name + "</span>";
+                } else {
+                    return icon+name;
                 }
             },
 
