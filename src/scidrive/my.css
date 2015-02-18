@@ -8,7 +8,7 @@
 @import "../dojox/mobile/themes/iphone/Switch.css";
 @import "../dojox/form/resources/CheckedMultiSelect.css";
 @import "../gridx/resources/claro/Gridx.css";
-@import "resources/font-awesome-4.2.0/css/font-awesome.min.css";
+@import "//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css";
 
 html, body {
 	width: 100%;
