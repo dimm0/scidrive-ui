@@ -13,6 +13,3 @@
 [submodule "src/gridx"]
 	path = src/gridx
 	url = https://github.com/oria/gridx.git
-[submodule "src/scidrive/resources/font-awesome-4.2.0"]
-	path = src/scidrive/resources/font-awesome-4.2.0
-	url = https://github.com/FortAwesome/Font-Awesome.git
