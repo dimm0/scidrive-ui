@@ -193,7 +193,6 @@ define([
                                                 }
                                             ).then(
                                                 function(data) {
-                                                    console.debug(data.url);
                                                     var lb = new dojox.image.LightboxDialog({
                                                         hide: function() {
                                                             console.debug("DEstroy");
@@ -341,7 +340,37 @@ define([
                             }
                         }
                     }, this.grid);
-                    //connect.connect(this.gridWidget.plugin('dnd'), "onDragIn", this, "_dragIn");
+                    
+                    this.gridWidget.dnd._dnd._source.onDropExternal = function(source, nodes, copy) {
+                        for (var i = 0; i < nodes.length; i++) {
+
+                            var nodePath = domAttr.get(nodes[0], "rowid");
+                            var nodeId = source.grid.store.getNodeVoId(nodePath);
+
+                            var nodePathArray = nodePath.split('/');
+                            var nodeName = nodePathArray[nodePathArray.length - 1];
+
+                            var curPath = panel.gridWidget._currentPath;
+                            var curPathArray = curPath.split('/');
+                            curPathArray.push(nodeName);
+                            curPath = curPathArray.join("/");
+
+                            var store = panel.store;
+                            var thisNodeId = store.getNodeVoId(curPath);
+
+                            var args = [store, thisNodeId];
+
+                            console.debug(nodeId);
+                            console.debug(thisNodeId);
+
+
+                            if (source.grid.store.vospace != store.vospace) { // different VOSpaces
+                                source.grid.store.pullFromVoJob(nodeId, store.pullToVoJob, args);
+                            } else {
+                                source.grid.store.moveJob(nodeId, thisNodeId);
+                            }
+                        }
+                    };
 
                     connect.connect(this.gridWidget, "dokeypress", this, function(e) {
                         if (e.keyCode == keys.DELETE) { // press delete on grid
@@ -354,9 +383,7 @@ define([
                         this.parentPanel.updateCurrentPanel(this);
                     });
 
-                    // /*Call startup() to render the grid*/
                     this.gridWidget.startup();
-
 
                     this.parentPanel.updateCurrentPanel(this);
                 }
@@ -372,33 +399,6 @@ define([
                 if (!(gridIsUpdating && notRefreshIfUpdating)) {
                     this.gridWidget.model.clearCache();
                     this.gridWidget.body.refresh();
-                }
-            },
-
-            _dragIn: function(sourcePlugin, isCopy) {
-                var selectedArray = sourcePlugin.selector.getSelected("row", true);
-
-                for (var i = 0; i < selectedArray.length; i++) {
-                    var nodePath = selectedArray[i].id;
-                    var nodeId = sourcePlugin.grid.store.getNodeVoId(nodePath);
-
-                    var nodePathArray = nodePath.split('/');
-                    var nodeName = nodePathArray[nodePathArray.length - 1];
-
-                    var curPath = this.gridWidget._currentPath;
-                    var curPathArray = curPath.split('/');
-                    curPathArray.push(nodeName);
-                    curPath = curPathArray.join("/");
-                    var thisNodeId = this.store.getNodeVoId(curPath);
-
-                    var store = this.store;
-                    var args = [store.vospace, thisNodeId];
-
-                    if (sourcePlugin.grid.store.vospace != this.store.vospace) { // different VOSpaces
-                        sourcePlugin.grid.store.pullFromVoJob(sourcePlugin.grid.store.vospace, nodeId, store.pullToVoJob, args);
-                    } else {
-                        sourcePlugin.grid.store.moveJob(store.vospace, nodeId, thisNodeId);
-                    }
                 }
             },
 

@@ -111,13 +111,13 @@ define(["dojox/data/QueryReadStore", "dojo/_base/declare", "dojo/json", "dojo/re
 			this._numRows = numRows;
 		},
 
-		pullFromVoJob: function(vospace, id, handler/*function*/, args/*handler args*/) {
+		pullFromVoJob: function(id, handler/*function*/, args/*handler args*/) {
             var writer = new XMLWriter();
             var reqData = writer.createPullFromVoJob(id);
 
             var writer = new XMLWriter();
-            vospace.request(
-                vospace.url+"/transfers",
+            this.vospace.request(
+                this.vospace.url+"/transfers",
                 "POST", {
 	                headers: { "Content-Type": "application/xml"},
 	                data: reqData,
@@ -127,12 +127,10 @@ define(["dojox/data/QueryReadStore", "dojo/_base/declare", "dojo/json", "dojo/re
 				function(data){
                     if(undefined != data) {
                         var endpoint = writer.selectSingleNode(data.documentElement, "//vos:protocolEndpoint/text()", {vos: "http://www.ivoa.net/xml/VOSpace/v2.0"}).nodeValue;
-                        console.debug("Got endpoint for pullFrom job: "+endpoint);
                         if(null != handler) {
-                            if(null == args)
-                                args = [];
                             args.push(endpoint);
-                            handler.apply(this, args);
+                            var pullstore = args.shift();
+                            handler.apply(pullstore, args);
                         }
                     } else {
                         console.error("Error creating new pullFrom task");
@@ -143,12 +141,12 @@ define(["dojox/data/QueryReadStore", "dojo/_base/declare", "dojo/json", "dojo/re
             );
         },
 
-        pullToVoJob: function(vospace, id, endpoint) {
+        pullToVoJob: function(id, endpoint) {
             console.debug("Pulling "+endpoint+" to "+id);
             var writer = new XMLWriter();
             var reqData = writer.createPullToVoJob(id, endpoint);
-            vospace.request(
-                vospace.url+"/transfers",
+            this.vospace.request(
+                this.vospace.url+"/transfers",
                 "POST", {
 	                headers: { "Content-Type": "application/xml"},
 	                data: reqData,
@@ -161,12 +159,12 @@ define(["dojox/data/QueryReadStore", "dojo/_base/declare", "dojo/json", "dojo/re
             );
         },
 
-        moveJob: function(vospace, from, to) {
+        moveJob: function(from, to) {
             console.debug("Moving from"+from+" to "+to);
             var writer = new XMLWriter();
             var reqData = writer.createMoveJob(from, to);
-            vospace.request(
-                vospace.url+"/transfers",
+            this.vospace.request(
+                this.vospace.url+"/transfers",
                 "POST", {
 	                headers: { "Content-Type": "application/xml"},
 	                data: reqData,
@@ -177,9 +175,6 @@ define(["dojox/data/QueryReadStore", "dojo/_base/declare", "dojo/json", "dojo/re
                     console.debug("Created move Job");
                 }
             );
-        }
-
-
-		
+        }		
 	});
 });
