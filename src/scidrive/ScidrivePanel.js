@@ -497,7 +497,7 @@
 
           var dialog = new Dialog({
             title: "Settings",
-            style: "width: 95%; height: 500px;",
+            style: "width: 95%; height: 560px;",
             onHide: function() {
               this.destroyRecursive();
             }
@@ -511,7 +511,7 @@
           var tabContainer = new TabContainer({
             doLayout: false,
             tabPosition: "left-h",
-            // style: "height: 500px; width: 100%;",
+            //style: "height: 800px; width: 100%;",
             tabStrip: true,
             title: "Metadata extractors"
           });
