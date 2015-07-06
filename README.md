@@ -9,11 +9,10 @@ Quick Start
 -----------
 
 0. Clone the repository using `git clone --recursive`.
-1. Fix the error in dojo by modifying css according to https://bugs.dojotoolkit.org/ticket/16320
-2. Modify scidrive-ui/src/scidrive/resources/regions.json to point to the SciDrive mirrors you'd like to use.
-3. Run `build.sh`, which will create an optimised build in `dist/`.
-4. Upload `dist/` to a Web Server
-5. You can start using the SciDrive Web UI.
+1. Modify scidrive-ui/src/scidrive/resources/regions.json to point to the SciDrive mirrors you'd like to use.
+2. Run `build.sh`, which will create an optimised build in `dist/`.
+3. Upload `dist/` to a Web Server
+4. You can start using the SciDrive Web UI.
 
 Installing push notifications node.js service
 ---------------------------------------------
@@ -21,7 +20,7 @@ Installing push notifications node.js service
 1. install [node.js](http://nodejs.org/)
 2. run `npm install rabbitmq-nodejs-client amqp@0.1.6` in scidrive-ui/rabbit folder
 3. run `npm install forever -g`
-4. add rabbitmq server address to listen_rabbit.js script 
+4. add rabbitmq server address to listen_rabbit.js script
 5. run the service: `forever start listen_rabbit.js`
 6. add redirect to apache proxy_ajp:
 
@@ -38,4 +37,3 @@ A brief tour
 * To download a file, double-click on it.
 * To download a folder as a .tar archive, select "Download" from the folder's context menu.
 * There is additional documentation available in Help dialog of SciDrive.
-

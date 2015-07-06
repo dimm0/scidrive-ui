@@ -15,7 +15,8 @@ define([
 ], function(declare, lang, fx, connect, coreFx, aspect, domConstruct, xhr, JSON, ioQuery, has, sniff, Dialog) {
     return declare("scidrive.SciServerLogin", null, {
 
-        loginPortalUrl: 'http://zinc26.pha.jhu.edu:8082/',
+    	loginUrl: 'http://172.23.24.21/gwauth/SignIn.aspx?ReturnUrl=',
+    	logoutUrl: 'http://172.23.24.21/gwauth/SignOut.aspx?ReturnUrl=',
 
         constructor: function( /*Object*/ kwArgs) {
             lang.mixin(this, kwArgs);
@@ -61,34 +62,50 @@ define([
 
             }
         },
-
-        login: function(component) {
+        
+        getRedirectUrl: function(baseUrl, appendToken)
+        {
+        	// Build current URL to pass it to login page
             var curUrl = location.protocol + '//' + location.host + location.pathname;
-            if(this.isShare)
-                curUrl += encodeURIComponent((curUrl.indexOf('?')>0)?'&':'?'+
-                    'share='+this.id);
-            document.location.href = this.loginPortalUrl+'?callbackUrl='+curUrl;
+            
+            if (appendToken) {
+	            // Append keystone token placeholder (as required by the login portal)
+	            curUrl += (curUrl.indexOf('?')>0)?'&':'?'+'token=$keystoneToken';
+	            
+	            // Add share parameter
+	            if(this.isShare)
+	                curUrl += (curUrl.indexOf('?')>0)?'&':'?'+'share='+this.id;
+            }
+            
+            return baseUrl + encodeURIComponent(curUrl);
         },
 
-        logout: function(vospace, component, message) {
+        login: function(component) {
+            // Redirect to login page
+            document.location.href = this.getRedirectUrl(this.loginUrl, true);
+        },
+
+        logout: function(component, message) {
+
+        	// This is some magic I wouldn't like to touch
+            // Yeah, better not to touch this
             var identity = JSON.parse(localStorage.getItem('vospace_oauth_s'));
-            if(typeof vospace !== 'undefined') {
-                delete identity.regions[vospace.id];
-                localStorage.setItem('vospace_oauth_s', JSON.stringify(identity));
+            delete identity.regions[this.id];
+            localStorage.setItem('vospace_oauth_s', JSON.stringify(identity));
 
-                delete vospace.credentials;
+            delete this.credentials;
 
-                if(vospace.isShare) {
-                    this.vospaces = this.vospaces.filter(function(curvospace, index, array) {
-                        return curvospace.id != vospace.id;
-                    });
-                    dijit.byId("scidriveWidget").loginSelect.removeOption(vospace.id);
-                }
-
-                dijit.byId("scidriveWidget")._refreshRegions();
+            if(this.isShare) {
+                this.vospaces = this.vospaces.filter(function(curvospace, index, array) {
+                    return curvospace.id != vospace.id;
+                });
+                dijit.byId("scidriveWidget").loginSelect.removeOption(vospace.id);
             }
 
-            document.location.href = this.loginPortalUrl+"?logout=true"+((typeof message !== 'undefined')?"&message="+message:"");
+            dijit.byId("scidriveWidget")._refreshRegions();
+
+            // Redirect to logout page
+            document.location.href = this.getRedirectUrl(this.logoutUrl, false);
         },
 
         request: function(url, method, args) {

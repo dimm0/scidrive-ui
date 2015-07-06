@@ -1,30 +1,9 @@
 [
 	{
-		"id":"www.scidrive.org",
+		"id":"scitest01",
 		"defaultRegion":true,
-		"url":"http://www.scidrive.org/vospace-2.0",
-		"display":"JHU primary region",
+		"url":"http://localhost:8080/vospace-2.0",
+		"display":"scitest01",
 		"auth": "sciserver"
-	},
-	{
-		"id":"zinc26.pha.jhu.edu",
-		"defaultRegion":false,
-		"url":"http://zinc26.pha.jhu.edu/vospace-2.0",
-		"display":"JHU dev",
-		"auth": "sciserver"
-	},
-	{
-		"id":"dimm.pha.jhu.edu",
-		"defaultRegion":false,
-		"url":"http://dimm.pha.jhu.edu/vospace-2.0",
-		"display":"Dimm",
-		"auth": "sciserver"
-	},
-	{
-		"id":"vospace.sdsc.edu",
-		"defaultRegion":false,
-		"url":"http://vospace.sdsc.edu:8080/vospace-2.0",
-		"display":"SDSC main",
-		"auth": "oauth"
 	}
 ]

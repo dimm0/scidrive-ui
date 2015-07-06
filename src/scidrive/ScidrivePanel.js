@@ -35,13 +35,12 @@
   "scidrive/NewFilePanel",
   "scidrive/NewDirPanel",
   "scidrive/AccountSettings",
-  "numeral/numeral",
   "dojox/grid/DataGrid",
   "dojo/text!./templates/ScidrivePanel.html"
   ],
   function(declare, array, lang, query, domStyle, domConstruct, keys, on, Toggler, coreFx, ItemFileWriteStore, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin,
     BorderContainer, TabContainer, ContentPane, Toolbar, Tooltip, ProgressBar, Button, Select, MultiSelect, ToggleButton, TextBox, CheckBox, Dialog, TableContainer,
-    FilePanel, DataGrid, VosyncReadStore, JobsManager, DynamicPropertiesForm, NewFilePanel, NewDirPanel, AccountSettings, numeral, DojoDataGrid, template) {
+    FilePanel, DataGrid, VosyncReadStore, JobsManager, DynamicPropertiesForm, NewFilePanel, NewDirPanel, AccountSettings, DojoDataGrid, template) {
     return declare([WidgetBase, TemplatedMixin, WidgetsInTemplateMixin], {
         templateString: template,
 
@@ -295,8 +294,8 @@
                   progress: accountInfo.quota_info.normal
                 });
 
-                var tooltipText = numeral(accountInfo.quota_info.normal).format('0.0 b')+
-                " of "+numeral(accountInfo.quota_info.quota).format('0.0 b')+" used";
+                var tooltipText = accountInfo.quota_info.normal.fileSize(1)+
+                " of "+accountInfo.quota_info.quota.fileSize(1)+" used";
                 panel.userLimitTooltip.set("label", tooltipText);
                 dijit.Tooltip.defaultPosition=['below-centered'];
                 panel.userLimitTooltip.set("connectId",panel.userLimitBar.id);
@@ -333,34 +332,37 @@
                 numRows: "items"
             });
 
-            if(component != null) {
-                var store = store;
-                store.parentPanel = component;
-                component.setStore(store);
-                this._updateUserInfo();
-                this._refreshRegions();
-            } else { // init
-                if(undefined == this.panel1) {
-                    this.panel1 = new FilePanel({
-                        login: this.loginToVO,
-                        store: store,
-                        parentPanel: this
-                        }).placeAt(this.panel1contentpane);
-                    this.panel1.store.parentPanel = this.panel1;
-                    this.updateCurrentPanel(this.panel1);
-                } else {
-                    dojo.byId(this.panel2contentpane.id).style.width = "50%";
-                    this.rootContainer.resize();
-                    this.panel2 = new FilePanel({
-                        login: this.loginToVO,
-                        store: store,
-                        style: {height: "100%"},
-                        parentPanel: this
-                        }).placeAt(this.panel2contentpane);
-                    this.panel2.store.parentPanel = this.panel2;
-                    this.updateCurrentPanel(this.panel2);
-                    this.panel1.gridWidget.resize();
-                }
+            if(!vospace.credentials) {
+                vospace.login(component, true);
+            } else {
+              if(component != null) {
+                  store.parentPanel = component;
+                  component.setStore(store);
+                  this._updateUserInfo();
+                  this._refreshRegions();
+              } else { // init
+                  if(undefined == this.panel1) {
+                      this.panel1 = new FilePanel({
+                          login: this.loginToVO,
+                          store: store,
+                          parentPanel: this
+                          }).placeAt(this.panel1contentpane);
+                      this.panel1.store.parentPanel = this.panel1;
+                      this.updateCurrentPanel(this.panel1);
+                  } else {
+                      dojo.byId(this.panel2contentpane.id).style.width = "50%";
+                      this.rootContainer.resize();
+                      this.panel2 = new FilePanel({
+                          login: this.loginToVO,
+                          store: store,
+                          style: {height: "100%"},
+                          parentPanel: this
+                          }).placeAt(this.panel2contentpane);
+                      this.panel2.store.parentPanel = this.panel2;
+                      this.updateCurrentPanel(this.panel2);
+                      this.panel1.gridWidget.resize();
+                  }
+              }
             }
         },
 

@@ -27,15 +27,9 @@
 		</p>
 	</div>
 	<div dojoType="dijit.TitlePane" open="false" title="Accessing the data">
-		<p>Files can be downloaded by double-clicking on it. Also to download a file or folder with all its contents, right-click on it and choose Download from context menu. <br/><img src="scidrive/resources/help/Download.png"></img><br/>
+		<p>A file can be downloaded by double-clicking on it. To download a file or folder with all its contents, right-click on it and choose Download from context menu. <br/><img src="scidrive/resources/help/Download.png"></img><br/>
 		Folders are downloaded as .tar archives.<br/>
-		Online Preview is available for files recognized as scidrive/resources.</p>
-	</div>
-	<div dojoType="dijit.TitlePane" open="false" title="Multi-region support">
-		<p>The right dropdown element contains the list of available regions. Currently new SSO users registration is only supported in JHU region. SDSC only works for current users. Please send request if you need to be added to San Diego Supercomputing Center mirror users.<br/>
-		<img src="scidrive/resources/help/Regions.png"></img>
-		</p>
-		<p>The star before the region ID means the user is authenticated in this region using <a href="https://vaossotest.ncsa.illinois.edu/" target="_blank">Single Sign On (SSO)</a> service. When choosing the region with no star, the user will be asked to authenticate. The Log off removes the stored user credentials for currently selected region and opens the first authenticated one. If user is not currently authenticated in any region, he will be redirected to default region SSO authentication page.<br/>
+		Online Preview is available for files recognized as images.</p>
 	</div>
 	<div dojoType="dijit.TitlePane" open="false" title="Data sharing">
 		<div dojoType="dijit.TitlePane" open="false" title="Quick share">
@@ -53,13 +47,23 @@
 				The share ID can be used to provide access to the share for console scripts. To get the OAuth token for shared container, the "share" parameter should be added to request_token and authorize OAuth URLs:
 				<p><code>http://server/vospace-2.0/request_token?share=&lt;share_id&gt;</code></p>
 				<p><code>http://server/vospace-2.0/authorize?provider=vao&share=&lt;share_id&gt;</code></p>
-				When accessing the authorize URL with anonymous share ID, no user acton is needed. The URL can be queried by the script in automatic mode, as described here: <a href="https://github.com/dimm0/scidrive/wiki/Using-Dropbox-SDK" target="_blank">https://github.com/dimm0/scidrive/wiki/Using-Dropbox-SDK</a>
+				When accessing the authorize URL with anonymous share ID, no user acton is needed. The URL can be queried by the script in automatic mode, as described here: <a href="https://github.com/dimm0/scidrive/wiki/Using-Dropbox-SDK" target="_blank">https://github.com/idies/scidrive/wiki/Using-Dropbox-SDK</a>
 			</div>
 		</div>
 	</div>
 	<div dojoType="dijit.TitlePane" open="false" title="Metadata extraction">
 		<p>The service provides automatic extraction of metadata from uploaded files in the background. Filetypes are automatically recognized by its contents signatures. For some filetypes there are plugins to extract metadata and store it in side services. The needed plugins should be enabled using the metadata exctractors configurator.</p>
-		<p>The available metadata extractors arelisted on the left of the dialog. The symbol in extrctor name shows the current enabled/disabled status of the plugin. To change the status, use the switch and save button to save the state to the service.</p>
+		<p>The available metadata extractors are listed on the left of the dialog. The icon on the left shows the current enabled/disabled status of the plugin. To change the status, use the switch and then click 'Save'.</p>
+		<p>For example, to configure the tabular data extraction:</p>
+		<ul>
+			<li>Click <img src="scidrive/resources/interface/settings_btn.png" height="30px"></img> button</li>
+			<li>Choose "CasJobs/MyDB" from the list of plugins</li>
+			<li>Enable the plugin by the switch on top</li>
+			<li>Enter your CasJobs wsid and password following the instructions in the dialog</li>
+			<li>Choose containers where metadata extraction should be enabled</li>
+			<li>Click save button</li>
+			<li>Upload a file to the enabled folder(s). The status of metadata extraction can be checked in file metadata (right click a file, choose Metadata)</li>
+		</ul>
 	</div>
 	<div dojoType="dijit.TitlePane" open="false" title="REST API">
 		<p>The service supports both VOSpace 2.0 and Dropbox REST API to access the data.</p>

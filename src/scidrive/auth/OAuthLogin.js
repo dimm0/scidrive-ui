@@ -6,7 +6,7 @@ define( [
     "dojo/fx",
     "dojo/aspect",
     "dojo/dom-construct",
-    "dojo/request/xhr", 
+    "dojo/request/xhr",
     "dojo/json",
     "dojo/io-query",
     "dojo/has",
@@ -44,9 +44,10 @@ function(declare, lang, fx, connect, coreFx, aspect, domConstruct, xhr, JSON, io
             if(this.credentials.stage == "request") { // contains request token
                 this.login2(null);
             } else if(this.credentials.stage == "access") {
-                require(["scidrive/ScidrivePanel"], function(ScidrivePanel){
-                    if(undefined == dijit.byId("scidriveWidget")) {
-                        var pan = new ScidrivePanel({
+                var module = (that.isChooser)?'ScidriveChooserPanel':'ScidrivePanel';
+                require(["scidrive/"+module], function(SciDrivePanel){
+                    if("undefined" === typeof (dijit.byId("scidriveWidget"))) {
+                        var pan = new SciDrivePanel({
                             id: "scidriveWidget",
                             style: "width: 100%; height: 100%; opacity: 0;",
                             app: that
@@ -109,10 +110,9 @@ function(declare, lang, fx, connect, coreFx, aspect, domConstruct, xhr, JSON, io
             if(that.isShare) {
                 authorizeUrl += "&share="+that.id;
             }
-            alert("!!!");
             document.location.href = authorizeUrl;
         }
-        
+
         function success_open_window(data) {
             var respObject = ioQuery.queryToObject(data);
             var reqToken = respObject.oauth_token;
@@ -164,7 +164,7 @@ function(declare, lang, fx, connect, coreFx, aspect, domConstruct, xhr, JSON, io
         }
 
 
-        function failure(data, ioargs) { 
+        function failure(data, ioargs) {
             if(ioargs.xhr.status == 400 || ioargs.xhr.status == 401 || ioargs.xhr.status == 503) { // OAuth errors
                 var errorResponse = ioargs.xhr.responseText;
                 if(errorResponse.split("&")[0] != undefined) {
@@ -193,9 +193,10 @@ function(declare, lang, fx, connect, coreFx, aspect, domConstruct, xhr, JSON, io
 
     },
 
-    login2: function(vospace, component) {
+    login2: function(component) {
         var that = this;
-        require(["scidrive/ScidrivePanel"], function(ScidrivePanel){
+        require(["scidrive/ScidrivePanel", "scidrive/ScidriveChooserPanel"], function(SciDrivePanel, SciDriveChooserPanel){
+            var obj = (this.isChooser)?SciDriveChooserPanel:SciDrivePanel;
             var url = that.url+"/access_token";
 
             dojo.xhrPost(OAuth.sign("POST", {
@@ -218,7 +219,8 @@ function(declare, lang, fx, connect, coreFx, aspect, domConstruct, xhr, JSON, io
                     localStorage.setItem('vospace_oauth_s', JSON.stringify(identity));
 
                     if(undefined == dijit.byId("scidriveWidget")) {
-                        var pan = new ScidrivePanel({
+                        var obj = (that.isChooser)?SciDriveChooserPanel:SciDrivePanel;
+                        var pan = new obj({
                             id: "scidriveWidget",
                             style: "width: 100%; height: 100%; opacity: 0;",
                             app: that
@@ -255,29 +257,29 @@ function(declare, lang, fx, connect, coreFx, aspect, domConstruct, xhr, JSON, io
                     localStorage.setItem('vospace_oauth_s', JSON.stringify(identity));
 
                     if(ioargs.xhr.status == 401) {
-                        that.login(vospace, null);
+                        that.login(null);
                     } else {
                         alert("Error logging in: "+ ioargs.xhr.responseText);
                     }
-                    
+
                 }
             },that.credentials));
         });
 
     },
 
-    logout: function(vospace, component) {
+    logout: function(component) {
         var identity = JSON.parse(localStorage.getItem('vospace_oauth_s'));
-        delete identity.regions[vospace.id];
+        delete identity.regions[this.id];
         localStorage.setItem('vospace_oauth_s', JSON.stringify(identity));
 
-        delete vospace.credentials;
+        delete this.credentials;
 
-        if(vospace.isShare) {
+        if(this.isShare) {
             this.vospaces = this.vospaces.filter(function(curvospace, index, array) {
-                return curvospace.id != vospace.id;
+                return curvospace.id != this.id;
             });
-            dijit.byId("scidriveWidget").loginSelect.removeOption(vospace.id);
+            dijit.byId("scidriveWidget").loginSelect.removeOption(this.id);
         }
 
         dijit.byId("scidriveWidget")._refreshRegions();
@@ -289,25 +291,26 @@ function(declare, lang, fx, connect, coreFx, aspect, domConstruct, xhr, JSON, io
             if(vospace.defaultRegion) {
                 defaultVospace = vospace;
             }
-            if(undefined == authenticatedVospace && undefined != identity.regions[vospace.id]){
+            if("undefined" === typeof authenticatedVospace && "undefined" !== typeof identity.regions[vospace.id]){
                 authenticatedVospace = vospace;
             }
         }
 
-        //First try to login to default vospace if is authenticated or don't have any authenticated at all
-        if(undefined != identity.regions[defaultVospace.id] || undefined == authenticatedVospace) {
-            dijit.byId("scidriveWidget").loginToVO(defaultVospace, component);
+        // First try to login to default vospace if is authenticated or don't have any authenticated at all
+        if(undefined == authenticatedVospace) {
+            document.location.href = document.location.href.substr(0, document.location.href.lastIndexOf("/"));
         } else {
             dijit.byId("scidriveWidget").loginToVO(authenticatedVospace, component);
         }
 
-        var otherComponent = (component == panel1)?panel2:panel1;
-        if(otherComponent != undefined && otherComponent.store.vospace.id == vospace.id && authenticatedVospace != undefined) {
-            dijit.byId("scidriveWidget").loginToVO(authenticatedVospace, otherComponent);
+        var scidrivePanel = dijit.byId("scidriveWidget");
+        var otherComponent = (component == scidrivePanel.panel1)?scidrivePanel.panel2:scidrivePanel.panel1;
+        if(otherComponent != undefined && otherComponent.store.vospace.id == this.id && authenticatedVospace != undefined) {
+            scidrivePanel.loginToVO(authenticatedVospace, otherComponent);
         }
 
         //component._refreshRegions();
-            
+
     },
 
     request: function(url, method, args) {
@@ -319,18 +322,41 @@ function(declare, lang, fx, connect, coreFx, aspect, domConstruct, xhr, JSON, io
         var params = {
             headers: {
                 'Authorization': OAuth.sign(
-                    method, 
-                    {url: url}, 
+                    method,
+                    {url: url,
+                        content: (typeof args === "undefined")?undefined:args.content},
                     this.credentials)
                 .headers["Authorization"]
             }
         };
 
         if("undefined" !== typeof args)
-            params = lang.mixin(params, args);
+            this.mixinDeep(params, args);
 
-        params = lang.mixin(params, {"method": method});
+        this.mixinDeep(params, {"method": method});
+        if(args)
+            params.query = ioQuery.objectToQuery(args.content);
         return params;
+    },
+
+    mixinDeep: function(dest, source) {
+     //Recursively mix the properties of two objects
+     var empty = {};
+     for (var name in source) {
+          if(!(name in dest) || (dest[name] !== source[name] && (!(name in empty) || empty[name] !== source[name]))){
+               try {
+                    if ( source[name].constructor==Object ) {
+                         dest[name] = this.mixinDeep(dest[name], source[name]);
+                    } else {
+                         dest[name] = source[name];
+                    };
+               } catch(e) {
+                    // Property in destination object not set. Create it and set its value.
+                    dest[name] = source[name];
+               };
+          };
+     }
+     return dest;
     }
   });
 });

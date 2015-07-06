@@ -6,16 +6,13 @@ define([
         "dojo/aspect",
         "dojo/_base/array",
         "dojo/on",
+        "dojo/html",
         "dojo/keys",
         "dojo/dom-construct",
         "dojo/dom-style",
         "dojo/dom-attr",
         "dojo/store/Memory",
         "dijit/_WidgetBase",
-        "dojox/grid/enhanced/plugins/Pagination",
-        "dojox/grid/enhanced/plugins/DnD",
-        "dojox/grid/enhanced/plugins/Selector",
-        "dojox/grid/enhanced/plugins/Menu",
         "scidrive/DataGrid",
         "dijit/Menu",
         "dojox/image/Lightbox",
@@ -40,26 +37,39 @@ define([
         "dijit/DropDownMenu",
         "dijit/InlineEditBox",
         "dijit/Toolbar",
+        "dijit/TooltipDialog",
         "dijit/ProgressBar",
         "dijit/Dialog",
         "dijit/registry",
+        "dijit/popup",
         "dojox/widget/Dialog",
         "dojo/data/ItemFileWriteStore",
         "dijit/TitlePane",
+        "gridx/core/model/cache/Async",
+
+        'gridx/modules/Focus',
+        'gridx/modules/ColumnResizer',
+        'gridx/modules/extendedSelect/Row',
+        'gridx/modules/VirtualVScroller',
+        'gridx/modules/Menu',
+        'gridx/modules/CellWidget',
+        'gridx/modules/dnd/Row',
+        'gridx/modules/move/Row',
+
+
         "scidrive/XMLWriter"
     ],
-    function(declare, connect, fx, Deferred, aspect, array, on, keys, domConstruct, domStyle, domAttr, Memory, WidgetBase, PaginationPlugin, DnDPlugin, SelectorPlugin,
-        MenuPlugin, DataGrid, Menu, LightBox, ConfirmDialog, MetadataViewer, TemplatedMixin, WidgetsInTemplateMixin, _ContentPaneResizeMixin, template, BorderContainer, ContentPane, _LayoutWidget,
+    function(declare, connect, fx, Deferred, aspect, array, on, html, keys, domConstruct, domStyle, domAttr, Memory, WidgetBase,
+        DataGrid, Menu, Lightbox, ConfirmDialog, MetadataViewer, TemplatedMixin, WidgetsInTemplateMixin, _ContentPaneResizeMixin, template, BorderContainer, ContentPane, _LayoutWidget,
         Form, Button, Select, CheckBox, ValidationTextBox, TextBox, Textarea,
-        FilteringSelect, PopupMenuBarItem, DropDownMenu, InlineEditBox, Toolbar, ProgressBar, Dialog, registry, dojox_Dialog, ItemFileWriteStore, TitlePane, XMLWriter
+        FilteringSelect, PopupMenuBarItem, DropDownMenu, InlineEditBox, Toolbar, TooltipDialog, ProgressBar, Dialog, registry, popup, dojox_Dialog, ItemFileWriteStore, TitlePane, Async,
+        Focus, ColumnResizer, ExtendedSelectRow, VirtualVScroller, GridMenu, CellWidget, DnDRow, MoveRow, XMLWriter
     ) {
         return declare([WidgetBase, _LayoutWidget, _ContentPaneResizeMixin /* These 2 make it resizing in height on window resize */ , TemplatedMixin, WidgetsInTemplateMixin], {
 
             templateString: template,
             store: null,
             gridWidget: null,
-            _menuItems: null,
-            _menuSelectedItem: null,
 
             _uploadFilesQueue: null,
             _isUploading: false,
@@ -78,194 +88,194 @@ define([
                     var panel = this; // to keep context
 
                     this._createUploader();
-
-                    var rowMenuObject = new Menu();
-
-                    rowMenuObject.addChild(new dijit.MenuItem({
-                        label: "Download",
-                        onClick: function(e) {
-                            panel.store.vospace.request(
-                                encodeURI(panel.store.vospace.url + "/1/media/sandbox" + panel._menuSelectedItem.i.path),
-                                "GET", {
-                                    handleAs: "json"
-                                }
-                            ).then(
-                                function(data) {
-                                    require(["dojo/request/iframe"], function(iframe) {
-                                        iframe(data.url, {
-                                            method: "GET"
-                                        }).then(function(err) {
-                                            console.debug(err);
-                                        }).cancel();
-                                    });
-                                },
-                                function(error) {
-                                    panel._handleError(error);
-                                }
-                            );
-                        }
-                    }));
-                    rowMenuObject.addChild(new dijit.MenuItem({
-                        label: "Metadata...",
-                        onClick: function(e) {
-                            panel._showMetadata(panel._menuSelectedItem.i.path);
-                        }
-                    }));
-
-                    this._menuItems = {};
-
-                    this._menuItems['previewMenuItem'] = new dijit.MenuItem({
-                        label: "Preview...",
-                        onClick: function(e) {
-                            panel.store.vospace.request(
-                                encodeURI(panel.store.vospace.url + "/1/media/sandbox" + panel._menuSelectedItem.i.path),
-                                "GET", {
-                                    handleAs: "json"
-                                }
-                            ).then(
-                                function(data) {
-                                    var lb = new dojox.image.Lightbox({
-                                        title: "Preview",
-                                        group: "group",
-                                        href: data.url
-                                    });
-                                    lb.startup();
-                                    setTimeout(function() {
-                                        lb.show();
-                                    }, 2000);
-                                },
-                                function(error) {
-                                    panel._handleError(error);
-                                }
-                            );
-                        }
-                    });
-                    rowMenuObject.addChild(this._menuItems['previewMenuItem']);
-                    rowMenuObject.addChild(new dijit.MenuItem({
-                        label: "Delete",
-                        onClick: function(e) {
-                            var selectedItems = panel.gridWidget.selection.getSelected("row", true);
-
-                            if (selectedItems != undefined) {
-                                var selected = selectedItems.filter(function(val) {
-                                    return val == panel._menuSelectedItem;
-                                });
-
-                                if (selected.length > 0) {
-                                    panel._deleteSelection(selectedItems);
-                                } else {
-                                    panel._deleteSelection(panel._menuSelectedItem);
-                                }
-                            } else { // nothing is selected
-                                panel._deleteSelection(panel._menuSelectedItem);
-                            }
-                        }
-                    }));
-                    this._menuItems['pullUrlMenuItem'] = new dijit.MenuItem({
-                        label: "Pull from URL...",
-                        tooltip: "Pull data from URL to the selected item",
-                        onClick: function(e) {
-                            panel.transferNode.value = panel._menuSelectedItem.i.path;
-                            panel.urlInput.reset();
-                            panel.transferUrlDialog.show();
-                        }
-                    });
-                    rowMenuObject.addChild(this._menuItems['pullUrlMenuItem']);
-
-                    this._menuItems['mediaMenuItem'] = new dijit.MenuItem({
-                        label: "Quick Share URL...",
-                        onClick: function(e) {
-                            panel.store.vospace.request(
-                                encodeURI(panel.store.vospace.url + "/1/media/sandbox" + panel._menuSelectedItem.i.path),
-                                "GET", {
-                                    handleAs: "json"
-                                }
-                            ).then(
-                                function(data) {
-                                    var infoContent = "<div style='background: #e3e3e3; margin: 30px; padding: 5px;'><a href=\"" + data.url + "\" target=\"_blank\">" + data.url + "</a></div>";
-                                    var infoWindow = new dijit.Dialog({
-                                        title: "File URL",
-                                        autofocus: false,
-                                        content: infoContent,
-                                        style: "background-color:white;z-index:5;position:relative;",
-                                        id: "IndoWindow",
-                                        onCancel: function() {
-                                            dijit.popup.close(this);
-                                            this.destroyRecursive(false);
-                                        }
-                                    });
-                                    infoWindow.show();
-                                },
-                                function(error) {
-                                    panel._handleError(error);
-                                }
-                            );
-                        }
-                    });
-                    rowMenuObject.addChild(this._menuItems['mediaMenuItem']);
-
-                    this._menuItems['shareMenuItem'] = new dijit.MenuItem({
-                        label: "Share...",
-                        onClick: function(e) {
-                            panel.store.vospace.request(
-                                encodeURI(panel.store.vospace.url + "/1/share_groups"),
-                                "GET", {
-                                    handleAs: "json"
-                                }
-                            ).then(
-                                function(data) {
-                                    var sharesStore = new Memory({
-                                        data: data
-                                    });
-
-                                    panel.shareSelect.store = sharesStore;
-                                    connect.connect(panel.shareSelect, "onChange", function(e) {
-                                        panel.store.vospace.request(
-                                            encodeURI(panel.store.vospace.url + "/1/share_groups/" + this.item.id),
-                                            "GET", {
-                                                handleAs: "json"
-                                            }
-                                        ).then(
-                                            function(data) {
-                                                domConstruct.empty(panel.usersList);
-                                                data.forEach(function(item, num) {
-                                                    var userDiv = dojo.create("div", {
-                                                        innerHTML: item
-                                                    });
-                                                    domConstruct.place(userDiv, panel.usersList);
-                                                });
-
-                                            },
-                                            function(error) {
-                                                panel._handleError(error);
-                                            }
-                                        );
-                                    });
-
-                                    panel.chooseShareGroupDialog.startup();
-
-                                    // reset the dialog if necessary
-                                    panel.chooseShareGroupDialog.show();
-                                }
-                            );
-                        }
-                    });
-                    rowMenuObject.addChild(this._menuItems['shareMenuItem']);
-
-
-                    rowMenuObject.startup();
-
-                    this.gridWidget = new DataGrid({
-                        id: this.grid.id,
-                        store: this.store,
-                        structure: [
+                    var structure =
                             [
                                 //{ name: ' ', field: 'is_dir' , formatter: this._formatFileIcon, width: '3%'},
                                 {
                                     name: 'Name',
                                     field: 'path',
+                                    widgetsInCell: true,
+                                    allowEventBubble: true,
                                     formatter: this._getName,
-                                    width: '62%'
+                                    decorator: function(){
+                                        return "<span data-dojo-type='dijit.layout.ContentPane' style='position: relative; overflow: hidden;' data-dojo-attach-point='cell_cont' data-dojo-props='maximum: 1' class='gridxHasGridCellValue'>"+
+                                                "<span data-dojo-attach-point='textfield' style='width: 100%; white-space:nowrap; overflow: hidden'></span>"+
+                                                "<span class='quickToolbarSpan' style='position:absolute; right: 0px;'>"+
+                                                "<button data-dojo-type='dijit.form.Button' data-dojo-attach-point='link_btn' baseClass='quickToolbarButtonBase' data-dojo-props='iconClass:\"quickToolbarButton link\", showLabel: false'>External link</button>"+
+                                                "<button data-dojo-type='dijit.form.Button' data-dojo-attach-point='share_btn' baseClass='quickToolbarButtonBase' data-dojo-props='iconClass:\"quickToolbarButton share\", showLabel: false'>Share</button>"+
+                                                "<button data-dojo-type='dijit.form.Button' data-dojo-attach-point='meta_btn' baseClass='quickToolbarButtonBase' data-dojo-props='iconClass:\"quickToolbarButton meta\", showLabel: false'>Metadata</button>"+
+                                                "<button data-dojo-type='dijit.form.Button' data-dojo-attach-point='preview_btn' baseClass='quickToolbarButtonBase' data-dojo-props='iconClass:\"quickToolbarButton preview\", showLabel: false'>Preview</button>"+
+                                                "<button data-dojo-type='dijit.form.Button' data-dojo-attach-point='download_btn' baseClass='quickToolbarButtonBase' data-dojo-props='iconClass:\"quickToolbarButton download\", showLabel: false'>Download</button>"+
+                                                "<button data-dojo-type='dijit.form.Button' data-dojo-attach-point='delete_btn' baseClass='quickToolbarButtonBase' data-dojo-props='iconClass:\"quickToolbarButton delete\", showLabel: false'>Delete</button>"+
+                                                "</span></span>";
+                                    },
+                                    setCellValue: function(gridData, storeData, cellWidget){
+                                        html.set(cellWidget.textfield, gridData);
+                                        var data = cellWidget.cell.row.rawData();
+                                        if((data.mime_type + "").indexOf("image") < 0)
+                                            domStyle.set(cellWidget.preview_btn.domNode, 'display', 'none');
+                                        else
+                                            domStyle.set(cellWidget.preview_btn.domNode, 'display', 'inline');
+
+                                        if(panel.gridWidget._currentPath == '/')
+                                            domStyle.set(cellWidget.share_btn.domNode, 'display', 'inline');
+                                        else
+                                            domStyle.set(cellWidget.share_btn.domNode, 'display', 'none');
+
+                                        if(!panel.store.vospace.isShare) {
+                                            domStyle.set(cellWidget.share_btn.domNode, 'display', 'inline');
+                                        } else {
+                                            domStyle.set(cellWidget.share_btn.domNode, 'display', 'none');
+                                        }
+                                    },
+                                    getCellWidgetConnects: function(cellWidget, cell){
+                                        return [
+                                          [cellWidget.link_btn, 'onMouseDown', function(e){
+
+
+                                            panel.store.vospace.request(
+                                                encodeURI(panel.store.vospace.url + "/1/media/sandbox" + cell.row.id),
+                                                "GET", {
+                                                    handleAs: "json"
+                                                }
+                                            ).then(
+                                                function(data) {
+                                                    var myTooltipDialog = new TooltipDialog({
+                                                        content: "<a href=\"" + data.url + "\" target=\"_blank\">" + data.url + "</a>",
+                                                        onMouseLeave: function(){
+                                                            this._timer = setTimeout(dojo.partial(function(){
+                                                                popup.close(myTooltipDialog);
+                                                                myTooltipDialog.destroyRecursive();
+                                                            }, this.id), 2000);
+                                                        },
+                                                        onMouseEnter: function(){
+                                                            clearTimeout(this._timer);
+                                                        }
+                                                    });
+
+                                                    popup.open({
+                                                        popup: myTooltipDialog,
+                                                        around: cell.node()
+                                                    });
+                                                },
+                                                function(error) {
+                                                    panel._handleError(error);
+                                                }
+                                            );
+
+                                            e.stopPropagation();
+                                          }],
+                                          [cellWidget.meta_btn, 'onMouseDown', function(e){
+                                            panel._showMetadata(cell.row.id);
+                                            e.stopPropagation();
+                                          }],
+                                          [cellWidget.delete_btn, 'onMouseDown', function(e){
+                                            var selectedItems = panel.gridWidget.select.row.getSelected();
+                                            if (typeof selectedItems !== "undefined") {
+                                                var selected = selectedItems.filter(function(val) {
+                                                    return val == cell.row.id;
+                                                });
+                                                if(selected.length > 0){
+                                                    panel._deleteSelection(selectedItems);
+                                                } else {
+                                                    panel._deleteSelection(cell.row.id);
+                                                }
+                                            } else { // nothing is selected
+                                                panel._deleteSelection(cell.row.id);
+                                            }
+                                            panel.gridWidget.select.row.clear();
+                                          }],
+                                          [cellWidget.preview_btn, 'onMouseDown', function(e){
+                                            panel.store.vospace.request(
+                                                encodeURI(panel.store.vospace.url + "/1/media/sandbox" + cell.row.id),
+                                                "GET", {
+                                                    handleAs: "json"
+                                                }
+                                            ).then(
+                                                function(data) {
+                                                    var lb = new dojox.image.LightboxDialog({
+                                                        hide: function() {
+                                                            console.debug("DEstroy");
+                                                            this.destroyRecursive();
+                                                        }
+                                                    }).startup();
+                                                    setTimeout(function() {
+                                                        lb.show({ title:cell.row.id, href: data.url });
+                                                    }, 2000);
+                                                },
+                                                function(error) {
+                                                    panel._handleError(error);
+                                                }
+                                            );
+                                            e.stopPropagation();
+                                          }],
+                                          [cellWidget.download_btn, 'onMouseDown', function(e){
+                                            panel.store.vospace.request(
+                                                encodeURI(panel.store.vospace.url + "/1/media/sandbox" + cell.row.id),
+                                                "GET", {
+                                                    handleAs: "json"
+                                                }
+                                            ).then(
+                                                function(data) {
+                                                    require(["dojo/request/iframe"], function(iframe) {
+                                                        iframe(data.url, {
+                                                            method: "GET"
+                                                        }).then(function(err) {
+                                                            console.debug(err);
+                                                        }).cancel();
+                                                    });
+                                                },
+                                                function(error) {
+                                                    panel._handleError(error);
+                                                }
+                                            );
+
+                                          }],
+                                          [cellWidget.share_btn, 'onMouseDown', function(e) {
+                                            panel.store.vospace.request(
+                                                encodeURI(panel.store.vospace.url + "/1/share_groups"),
+                                                "GET", {
+                                                    handleAs: "json"
+                                                }
+                                            ).then(
+                                                function(data) {
+                                                    var sharesStore = new Memory({data: data});
+
+                                                    panel.shareSelect.store = sharesStore;
+                                                    connect.connect(panel.shareSelect, "onChange", function(e) {
+                                                        panel.store.vospace.request(
+                                                            encodeURI(panel.store.vospace.url + "/1/share_groups/" + cell.row.id),
+                                                            "GET", {
+                                                                handleAs: "json"
+                                                            }
+                                                        ).then(
+                                                            function(data) {
+                                                                domConstruct.empty(panel.usersList);
+                                                                data.forEach(function(item, num) {
+                                                                    var userDiv = dojo.create("div", {
+                                                                        innerHTML: item
+                                                                    });
+                                                                    domConstruct.place(userDiv, panel.usersList);
+                                                                });
+
+                                                            },
+                                                            function(error) {
+                                                                panel._handleError(error);
+                                                            }
+                                                        );
+                                                    });
+
+                                                    panel.chooseShareGroupDialog.nodepath = cell.row.id;
+                                                    panel.chooseShareGroupDialog.startup();
+
+                                                    // reset the dialog if necessary
+                                                    panel.chooseShareGroupDialog.show();
+                                                }
+                                            );
+                                          }]
+                                        ];
+                                    },
+                                    width: '60%'
                                 }, {
                                     name: 'Size',
                                     field: 'size',
@@ -275,48 +285,35 @@ define([
                                 {
                                     name: 'Type',
                                     field: 'mime_type',
-                                    formatter: this._shortenString,
+                                    decorator: this._shortenString,
                                     width: "30%"
                                 }
-                            ]
-                        ],
-                        rowSelector: '0px',
+                            ];
+
+                    this.gridWidget = new DataGrid({
+                        id: this.grid.id,
+                        store: this.store,
+                        cacheClass: Async,
+                        structure: structure,
                         canSort: false,
-                        plugins: {
-                            pagination: {
-                                defaultPageSize: 25, // Integer, what page size will be used by default
-                                gotoButton: true
-                            },
-                            dnd: {
-                                'dndConfig': {
-                                    'out': {
-                                        col: false,
-                                        row: true,
-                                        cell: false
-                                    },
-                                    'in': {
-                                        col: false,
-                                        row: true,
-                                        cell: false
-                                    },
-                                    'within': false
-                                }
-                            },
-                            selector: {
-                                row: 'multiple',
-                                cell: 'disabled',
-                                col: 'disabled'
-                            },
-                            menus: {
-                                rowMenu: rowMenuObject.id
-                            }
-                        },
+                        modules: [
+                            Focus,
+                            ColumnResizer,
+                            VirtualVScroller,
+                            CellWidget,
+                            ExtendedSelectRow,
+                            DnDRow,
+                            MoveRow
+                        ],
+                        selectRowTriggerOnCell: true,
+                        dndRowCanRearrange: false,
                         query: {
-                            list: 'true'
+                            list: 'true',
+                            path: "/"
                         },
                         pathWidget: this.pathSelect,
                         onRowDblClick: function(e) {
-                            var item = this.selection.getSelected("row", true)[0];
+                            var item = this.row(e.rowId).item();
                             if (item.i.is_dir) {
                                 this.setCurrentPath(item.i.path);
                                 panel.parentPanel.updateCurrentPanel(panel);
@@ -343,7 +340,37 @@ define([
                             }
                         }
                     }, this.grid);
-                    connect.connect(this.gridWidget.plugin('dnd'), "onDragIn", this, "_dragIn");
+                    
+                    this.gridWidget.dnd._dnd._source.onDropExternal = function(source, nodes, copy) {
+                        for (var i = 0; i < nodes.length; i++) {
+
+                            var nodePath = domAttr.get(nodes[0], "rowid");
+                            var nodeId = source.grid.store.getNodeVoId(nodePath);
+
+                            var nodePathArray = nodePath.split('/');
+                            var nodeName = nodePathArray[nodePathArray.length - 1];
+
+                            var curPath = panel.gridWidget._currentPath;
+                            var curPathArray = curPath.split('/');
+                            curPathArray.push(nodeName);
+                            curPath = curPathArray.join("/");
+
+                            var store = panel.store;
+                            var thisNodeId = store.getNodeVoId(curPath);
+
+                            var args = [store, thisNodeId];
+
+                            console.debug(nodeId);
+                            console.debug(thisNodeId);
+
+
+                            if (source.grid.store.vospace != store.vospace) { // different VOSpaces
+                                source.grid.store.pullFromVoJob(nodeId, store.pullToVoJob, args);
+                            } else {
+                                source.grid.store.moveJob(nodeId, thisNodeId);
+                            }
+                        }
+                    };
 
                     connect.connect(this.gridWidget, "dokeypress", this, function(e) {
                         if (e.keyCode == keys.DELETE) { // press delete on grid
@@ -352,12 +379,10 @@ define([
                         }
                     });
 
-                    connect.connect(this.gridWidget, "onRowContextMenu", this, "_rowcontextmenu");
                     on(this, "click", function(e) {
                         this.parentPanel.updateCurrentPanel(this);
                     });
 
-                    /*Call startup() to render the grid*/
                     this.gridWidget.startup();
 
                     this.parentPanel.updateCurrentPanel(this);
@@ -372,35 +397,8 @@ define([
             _refresh: function(notRefreshIfUpdating) {
                 var gridIsUpdating = ((this.gridWidget._eventSource != null) && (this.gridWidget._eventSource.readyState == 1));
                 if (!(gridIsUpdating && notRefreshIfUpdating)) {
-                    this.gridWidget._refresh(true);
-                    this.gridWidget.plugin('selector').clear();
-                }
-            },
-
-            _dragIn: function(sourcePlugin, isCopy) {
-                var selectedArray = sourcePlugin.selector.getSelected("row", true);
-
-                for (var i = 0; i < selectedArray.length; i++) {
-                    var nodePath = selectedArray[i].id;
-                    var nodeId = sourcePlugin.grid.store.getNodeVoId(nodePath);
-
-                    var nodePathArray = nodePath.split('/');
-                    var nodeName = nodePathArray[nodePathArray.length - 1];
-
-                    var curPath = this.gridWidget._currentPath;
-                    var curPathArray = curPath.split('/');
-                    curPathArray.push(nodeName);
-                    curPath = curPathArray.join("/");
-                    var thisNodeId = this.store.getNodeVoId(curPath);
-
-                    var store = this.store;
-                    var args = [store.vospace, thisNodeId];
-
-                    if (sourcePlugin.grid.store.vospace != this.store.vospace) { // different VOSpaces
-                        sourcePlugin.grid.store.pullFromVoJob(sourcePlugin.grid.store.vospace, nodeId, store.pullToVoJob, args);
-                    } else {
-                        sourcePlugin.grid.store.moveJob(store.vospace, nodeId, thisNodeId);
-                    }
+                    this.gridWidget.model.clearCache();
+                    this.gridWidget.body.refresh();
                 }
             },
 
@@ -412,7 +410,7 @@ define([
                     if (path instanceof Array) {
                         for (var i = 0; i < path.length; i++) {
                             panel.store.vospace.request(
-                                encodeURI(panel.store.vospace.url + "/nodes" + path[i].i.path),
+                                encodeURI(panel.store.vospace.url + "/nodes" + path[i]),
                                 "DELETE", {
                                     handleAs: "text"
                                 }
@@ -428,7 +426,7 @@ define([
 
                     } else {
                         panel.store.vospace.request(
-                            encodeURI(panel.store.vospace.url + "/nodes" + path.i.path),
+                            encodeURI(panel.store.vospace.url + "/nodes" + path),
                             "DELETE", {
                                 handleAs: "text"
                             }
@@ -456,25 +454,41 @@ define([
                 this.parentPanel.updateCurrentPanel(this);
             },
 
-            _getName: function(path, rowIndex) {
+            _getName: function(row, path) {
                 var pathTokens = path.split('/');
 
-                switch (this.grid.getItem(rowIndex).i.icon) {
+                var icon = "";
+                switch (row.icon) {
                     case "folder_public":
-                        return "<img src='scidrive/resources/folder.jpg' style='vertical-align:middle' title='Folder' alt='Folder' width='20'/>&nbsp;" + pathTokens[pathTokens.length - 1];
+                        icon = "<i class=\"fa fa-folder-o\" style=\"color: rgb(50,110,183)\"></i>&nbsp;";
+                        break;
                     case "file":
-                        return "<img src='scidrive/resources/file.png' style='vertical-align:middle' title='File' alt='File' width='20'/>&nbsp;" + pathTokens[pathTokens.length - 1];
+                        if(row.mime_type.indexOf("image") == 0)
+                            icon = "<i class=\"fa fa-file-image-o\" style=\"color: rgb(50,110,183)\"></i>&nbsp;";
+                        else
+                            icon = "<i class=\"fa fa-file-o\" style=\"color: rgb(50,110,183)\"></i>&nbsp;";
+                        break;
                     case "table":
-                        return "<img src='scidrive/resources/table.png' style='vertical-align:middle' title='File' alt='File' width='20'/>&nbsp;" + pathTokens[pathTokens.length - 1];
+                        icon = "<i class=\"fa fa-table\" style=\"color: rgb(50,110,183)\"></i>&nbsp;";
+                        break;
+                }
+
+
+                var len = 70;
+                var name = pathTokens[pathTokens.length - 1];
+                if (name && name.length > len) {
+                    return "<span title='" + name + "'>" + icon + name + "</span>";
+                } else {
+                    return icon+name;
                 }
             },
 
-            _shortenString: function(mime, rowIndex) {
+            _shortenString: function(mime, rowId, rowIndex) {
                 var max_len = 40;
                 if (!mime || mime.length < max_len) {
                     return mime;
                 } else {
-                    return "<div title='" + mime + "'>" + mime.substring(0, max_len) + "...</div>";
+                    return "<span title='" + mime + "'>" + mime.substring(0, max_len) + "...</span>";
                 }
             },
 
@@ -498,7 +512,9 @@ define([
                             content: meta_form,
                             onCancel: function() {
                                 dijit.popup.close(this);
-                                this.destroyRecursive(false);
+                            },
+                            onHide: function() {
+                                this.destroyRecursive();
                             }
                         });
 
@@ -519,7 +535,7 @@ define([
             },
 
             _logout: function() {
-                this.parentPanel.app.logout(this.store.vospace, this);
+                this.store.vospace.logout(this);
             },
 
             getUserInfo: function(updateInfo /* callback */ ) {
@@ -675,7 +691,7 @@ define([
                 params += "write_perm=" + !this.readOnlyCheckBox.checked;
 
                 panel.store.vospace.request(
-                    encodeURI(panel.store.vospace.url + "/1/shares/sandbox" + panel._menuSelectedItem.i.path + params),
+                    encodeURI(panel.store.vospace.url + "/1/shares/sandbox" + this.chooseShareGroupDialog.nodepath + params),
                     "PUT", {
                         handleAs: "json"
                     }
@@ -701,29 +717,6 @@ define([
                         panel._handleError(error);
                     }
                 );
-            },
-
-            _rowcontextmenu: function(e) {
-                this._menuSelectedItem = this.gridWidget.getItem(e.rowIndex);
-
-                if (this._menuSelectedItem.i.mime_type && this._menuSelectedItem.i.mime_type.indexOf("image") == 0) {
-                    this._menuItems["previewMenuItem"].set("disabled", false);
-                } else {
-                    this._menuItems["previewMenuItem"].set("disabled", true);
-                }
-
-                if (!this._menuSelectedItem.i.mime_type) { // folder
-                    this._menuItems["pullUrlMenuItem"].set("disabled", true);
-                } else {
-                    this._menuItems["pullUrlMenuItem"].set("disabled", false);
-                }
-
-                if (!this.store.vospace.isShare && this.gridWidget._currentPath == '/') { // root
-                    this._menuItems["shareMenuItem"].set("disabled", false);
-                } else {
-                    this._menuItems["shareMenuItem"].set("disabled", true);
-                }
-
             },
 
             _enableShareGroup: function(e) {
