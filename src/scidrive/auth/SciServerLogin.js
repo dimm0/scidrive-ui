@@ -15,8 +15,7 @@ define([
 ], function(declare, lang, fx, connect, coreFx, aspect, domConstruct, xhr, JSON, ioQuery, has, sniff, Dialog) {
     return declare("scidrive.SciServerLogin", null, {
 
-    	loginUrl: 'http://172.23.24.21/gwauth/SignIn.aspx?ReturnUrl=',
-    	logoutUrl: 'http://172.23.24.21/gwauth/SignOut.aspx?ReturnUrl=',
+        loginPortalUrl: 'http://127.0.0.1/login-portal/',
 
         constructor: function( /*Object*/ kwArgs) {
             lang.mixin(this, kwArgs);
@@ -62,32 +61,17 @@ define([
 
             }
         },
-        
-        getRedirectUrl: function(baseUrl, appendToken)
-        {
-        	// Build current URL to pass it to login page
-            var curUrl = location.protocol + '//' + location.host + location.pathname;
-            
-            if (appendToken) {
-	            // Append keystone token placeholder (as required by the login portal)
-	            curUrl += (curUrl.indexOf('?')>0)?'&':'?'+'token=$keystoneToken';
-	            
-	            // Add share parameter
-	            if(this.isShare)
-	                curUrl += (curUrl.indexOf('?')>0)?'&':'?'+'share='+this.id;
-            }
-            
-            return baseUrl + encodeURIComponent(curUrl);
-        },
 
         login: function(component) {
-            // Redirect to login page
-            document.location.href = this.getRedirectUrl(this.loginUrl, true);
+            var curUrl = location.protocol + '//' + location.host + location.pathname;
+            if(this.isShare)
+                curUrl += encodeURIComponent((curUrl.indexOf('?')>0)?'&':'?'+
+                    'share='+this.id);
+            document.location.href = this.loginPortalUrl+'?callbackUrl='+curUrl;
         },
 
-        logout: function(component, message) {
-
-        	// This is some magic I wouldn't like to touch
+        logout: function(vospace, component, message) {
+            // This is some magic I wouldn't like to touch
             // Yeah, better not to touch this
             var identity = JSON.parse(localStorage.getItem('vospace_oauth_s'));
             delete identity.regions[this.id];
@@ -104,8 +88,7 @@ define([
 
             dijit.byId("scidriveWidget")._refreshRegions();
 
-            // Redirect to logout page
-            document.location.href = this.getRedirectUrl(this.logoutUrl, false);
+            document.location.href = this.loginPortalUrl+"?logout=true"+((typeof message !== 'undefined')?"&message="+message:"");
         },
 
         request: function(url, method, args) {
