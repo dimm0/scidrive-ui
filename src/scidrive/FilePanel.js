@@ -141,7 +141,7 @@ define([
                                             ).then(
                                                 function(data) {
                                                     var myTooltipDialog = new TooltipDialog({
-                                                        content: "<a href=\"" + data.url + "\" target=\"_blank\">" + data.url + "</a>",
+                                                        content: data.url,
                                                         onMouseLeave: function(){
                                                             this._timer = setTimeout(dojo.partial(function(){
                                                                 popup.close(myTooltipDialog);
