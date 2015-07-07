@@ -73,10 +73,8 @@ function(GridX, declare, array, lang, html) {
                         that.body.refresh();
                     }, 3000)
 
-                dojo.xhrGet(scidrive.OAuth.sign("GET", {
-                    url: encodeURI(that.store.vospace.url+"/updates?path="+that.query.path),
-                    handleAs: "text",
-                    load: function(data){
+                that.store.vospace.request(encodeURI(that.store.vospace.url+"/updates?path="+that.query.path),
+                    "GET", function(data){
                         that._eventSource = new EventSource(that.store.vospace.url+'/updates/'+data);
                         that._eventSource.onmessage = refresh;
                         that._eventSource.onerror = function(e) {
@@ -84,11 +82,8 @@ function(GridX, declare, array, lang, html) {
                             that._eventSource.close();
                             that._eventSource = null;
                         };
-                    },
-                    error: function(data, ioargs) {
-                        console.error(data);
                     }
-                }, that.store.vospace.credentials));
+                );
             }
         }
 
