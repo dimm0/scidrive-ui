@@ -74,7 +74,7 @@ function(GridX, declare, array, lang, html) {
                     }, 3000)
 
                 that.store.vospace.request(encodeURI(that.store.vospace.url+"/updates?path="+that.query.path),
-                    "GET", function(data){
+                    "GET").then(function(data){
                         that._eventSource = new EventSource(that.store.vospace.url+'/updates/'+data);
                         that._eventSource.onmessage = refresh;
                         that._eventSource.onerror = function(e) {
