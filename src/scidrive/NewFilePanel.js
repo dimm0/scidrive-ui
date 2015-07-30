@@ -55,8 +55,7 @@ function(declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, on, key
           
           var cur_panel = this.current_panel;
           if(this.urlInput.get('value') !== ""){
-            cur_panel.store.pullToVoJob(cur_panel.store.vospace,
-              cur_panel.store.getNodeVoId(cur_panel.gridWidget._currentPath+"/"+fileName),
+            cur_panel.store.pullToVoJob(cur_panel.store.getNodeVoId(cur_panel.gridWidget._currentPath+"/"+fileName),
               this.urlInput.get('value'));
           } else { // create empty file
             if(cur_panel.gridWidget._currentPath == '/' && !cur_panel.store.vospace.isShare) {
