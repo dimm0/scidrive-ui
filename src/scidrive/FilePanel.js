@@ -379,7 +379,7 @@ define([
                         }
                     });
 
-                    on(this, "click", function(e) {
+                    on(this, "mouseenter", function(e) {
                         this.parentPanel.updateCurrentPanel(this);
                     });
 
