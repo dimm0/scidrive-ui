@@ -39,12 +39,21 @@ echo " Done"
 cd "$TOOLSDIR"
 
 if which node >/dev/null; then
-	node ../../dojo/dojo.js load=build --require "$LOADERCONF" --profile "$PROFILE" --releaseDir "$DISTDIR" $@
+  node ../../dojo/dojo.js load=build --require "$LOADERCONF" --profile "$PROFILE" --releaseDir "$DISTDIR" $@
 elif which java >/dev/null; then
-	java -Xms256m -Xmx256m  -cp ../shrinksafe/js.jar:../closureCompiler/compiler.jar:../shrinksafe/shrinksafe.jar org.mozilla.javascript.tools.shell.Main  ../../dojo/dojo.js baseUrl=../../dojo load=build --require "$LOADERCONF" --profile "$PROFILE" --releaseDir "$DISTDIR" $@
+  java -Xms256m -Xmx256m  -cp ../shrinksafe/js.jar:../closureCompiler/compiler.jar:../shrinksafe/shrinksafe.jar org.mozilla.javascript.tools.shell.Main  ../../dojo/dojo.js baseUrl=../../dojo load=build --require "$LOADERCONF" --profile "$PROFILE" --releaseDir "$DISTDIR" $@
 else
-	echo "Need node.js or Java to build!"
-	exit 1
+  echo "Need node.js or Java to build!"
+  exit 1
+fi
+
+if which node >/dev/null; then
+  node ../../dojo/dojo.js load=build --require "$LOADERCONF" --profile "$PROFILE" --releaseDir "$DISTDIR" $@
+elif which java >/dev/null; then
+  java -Xms256m -Xmx256m  -cp ../shrinksafe/js.jar:../closureCompiler/compiler.jar:../shrinksafe/shrinksafe.jar org.mozilla.javascript.tools.shell.Main  ../../dojo/dojo.js baseUrl=../../dojo load=build --require "$LOADERCONF" --profile "$PROFILE" --releaseDir "$DISTDIR" $@
+else
+  echo "Need node.js or Java to build!"
+  exit 1
 fi
 
 cd "$BASEDIR"
@@ -64,6 +73,12 @@ perl -pe "
   s/<\!--.*?-->//g;                          # Strip comments
   s/\s+/ /g;                                 # Collapse white-space" > "$DISTDIR/index.html"
 
-cp -r src/bootstrap dist/
+cat "$SRCDIR/example.html" | tr '\n' ' ' | \
+perl -pe "
+  s/<\!--.*?-->//g;                          # Strip comments
+  s/\s+/ /g;                                 # Collapse white-space" > "$DISTDIR/example.html"
+
+cp -r src/bootstrap $DISTDIR/
+cp -r $SRCDIR/scidrive_chooser.* $SRCDIR/example.html $DISTDIR/
 
 echo "Build complete"

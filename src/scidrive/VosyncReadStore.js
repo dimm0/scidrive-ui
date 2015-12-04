@@ -1,5 +1,5 @@
-define(["dojox/data/QueryReadStore", "dojo/_base/declare", "scidrive/OAuth", "dojo/json", "dojo/request/xhr", "scidrive/XMLWriter"], function(QueryReadStore, declare, OAuth, JSON, xhr, XMLWriter) {
-    declare("scidrive.VosyncReadStore", [QueryReadStore], {
+define(["dojox/data/QueryReadStore", "dojo/_base/declare", "dojo/json", "dojo/request/xhr", "dojo/io-query", "scidrive/XMLWriter"], function(QueryReadStore, declare, JSON, xhr, ioQuery, XMLWriter) {
+    return declare([QueryReadStore], {
 	
     	_lastPath : null,
     	vospace:null,
@@ -15,9 +15,7 @@ define(["dojox/data/QueryReadStore", "dojo/_base/declare", "scidrive/OAuth", "do
 		parentPanel: null,
 
 		_fetchItems: function(request, fetchHandler, errorHandler){
-
-			var cur = this;
-
+			var that = this;
 			var serverQuery = request.serverQuery || request.query || {};
 			//Need to add start and count
 			if(!this.doClientPaging){
@@ -39,43 +37,26 @@ define(["dojox/data/QueryReadStore", "dojo/_base/declare", "scidrive/OAuth", "do
 			// Compare the last query and the current query by simply json-encoding them,
 			// so we dont have to do any deep object compare ... is there some dojo.areObjectsEqual()???
 			if(this.doClientPaging && this._lastServerQuery !== null &&
-				JSON.stringify(serverQuery) == JSON.stringify(this._lastServerQuery) &&
+				dojo.toJson(serverQuery) == dojo.toJson(this._lastServerQuery) &&
 				this._lastPath == request.path
 				){
 				this._numRows = (this._numRows === -1) ? this._items.length : this._numRows;
 				fetchHandler(this._items, request, this._numRows);
 			}else{
-				var xhrFunc;
-				
-				switch(this.requestMethod.toLowerCase()){
-					case 'post': xhrFunc = dojo.xhrPost;
-					case 'put': xhrFunc = dojo.xhrPut;
-					case 'get': xhrFunc = dojo.xhrGet;
-					case 'delete': xhrFunc = dojo.xhrDelete;
-					default: xhrFunc = dojo.xhrGet;
-				}
+				var fullUrl = this.vospace.url+"/1/metadata/sandbox"+((request.query.path+"" != "")?request.query.path:"");
+				var xhrHandler = this.vospace.request(fullUrl, this.requestMethod.toUpperCase(), 
+					{
+						handleAs:"json", 
+						content:serverQuery,
+						failOk: true
+                	});
 
-				var fullUrl = this.vospace.url+"/1/metadata/sandbox"+((request.path+"" != "")?request.path:"");
-				
-				var xhrHandler = xhrFunc(OAuth.sign(this.requestMethod.toUpperCase(),{
-					url:fullUrl, 
-					handleAs:"json-comment-optional", 
-					content:serverQuery,
-					failOk: true,
-					error: function(data, ioargs) {
-						 // OAuth error
-						if(ioargs.xhr.status == 401) {
-                  			cur.parentPanel._handleError(data, ioargs);
-                  		}
-                	}
-                }, this.vospace.credentials));
 				request.abort = function(){
 					xhrHandler.cancel();
 				};
-				xhrHandler.addCallback(dojo.hitch(this, function(data){
-					this._xhrFetchHandler(data, request, fetchHandler, errorHandler);
-				}));
-				xhrHandler.addErrback(function(error){
+				xhrHandler.then(function(data){
+					that._xhrFetchHandler(data, request, fetchHandler, errorHandler);
+				}, function(error){
 					errorHandler(error, request);
 				});
 				// Generate the hash using the time in milliseconds and a randon number.
@@ -86,6 +67,7 @@ define(["dojox/data/QueryReadStore", "dojo/_base/declare", "scidrive/OAuth", "do
 			}
 		},
 		
+		// copied from QueryREadStore, uses data.contents instead of data.items
 		_xhrFetchHandler: function(data, request, fetchHandler, errorHandler){
 			data = this._filterResponse(data);
 			if(data.label){
@@ -129,71 +111,70 @@ define(["dojox/data/QueryReadStore", "dojo/_base/declare", "scidrive/OAuth", "do
 			this._numRows = numRows;
 		},
 
-		pullFromVoJob: function(vospace, id, handler/*function*/, args/*handler args*/) {
+		pullFromVoJob: function(id, handler/*function*/, args/*handler args*/) {
             var writer = new XMLWriter();
             var reqData = writer.createPullFromVoJob(id);
 
             var writer = new XMLWriter();
-            dojo.xhrPost(OAuth.sign("POST", {
-                url: vospace.url+"/transfers",
-                headers: { "Content-Type": "application/xml"},
-                postData: reqData,
-                handleAs: "xml",
-                sync: false,
-                handle: function(data, ioargs){
+            this.vospace.request(
+                this.vospace.url+"/transfers",
+                "POST", {
+	                headers: { "Content-Type": "application/xml"},
+	                data: reqData,
+                    handleAs: "xml"
+                }
+            ).then(
+				function(data){
                     if(undefined != data) {
                         var endpoint = writer.selectSingleNode(data.documentElement, "//vos:protocolEndpoint/text()", {vos: "http://www.ivoa.net/xml/VOSpace/v2.0"}).nodeValue;
-                        console.debug("Got endpoint for pullFrom job: "+endpoint);
                         if(null != handler) {
-                            if(null == args)
-                                args = [];
                             args.push(endpoint);
-                            handler.apply(this, args);
+                            var pullstore = args.shift();
+                            handler.apply(pullstore, args);
                         }
                     } else {
                         console.error("Error creating new pullFrom task");
                     }
-                }, error: function(err) {
+                }, function(err) {
                     console.debug(err);
                 }
-            }, vospace.credentials));
+            );
         },
 
-        pullToVoJob: function(vospace, id, endpoint) {
+        pullToVoJob: function(id, endpoint) {
             console.debug("Pulling "+endpoint+" to "+id);
             var writer = new XMLWriter();
             var reqData = writer.createPullToVoJob(id, endpoint);
-            dojo.xhrPost(OAuth.sign("POST", {
-                url: vospace.url+"/transfers",
-                headers: { "Content-Type": "application/xml"},
-                postData: reqData,
-                handleAs: "xml",
-                sync: false,
-                handle: function(data, ioargs){
+            this.vospace.request(
+                this.vospace.url+"/transfers",
+                "POST", {
+	                headers: { "Content-Type": "application/xml"},
+	                data: reqData,
+                    handleAs: "xml"
+                }
+            ).then(
+                function(data){
                     console.debug("Created pullToJob");
                 }
-            }, vospace.credentials));
+            );
         },
 
-        moveJob: function(vospace, from, to) {
+        moveJob: function(from, to) {
             console.debug("Moving from"+from+" to "+to);
             var writer = new XMLWriter();
             var reqData = writer.createMoveJob(from, to);
-            dojo.xhrPost(OAuth.sign("POST", {
-                url: vospace.url+"/transfers",
-                headers: { "Content-Type": "application/xml"},
-                postData: reqData,
-                handleAs: "xml",
-                sync: false,
-                handle: function(data, ioargs){
+            this.vospace.request(
+                this.vospace.url+"/transfers",
+                "POST", {
+	                headers: { "Content-Type": "application/xml"},
+	                data: reqData,
+                    handleAs: "xml"
+                }
+            ).then(
+                function(data){
                     console.debug("Created move Job");
                 }
-            }, vospace.credentials));
-        }
-
-
-		
+            );
+        }		
 	});
-	
-    return scidrive.VosyncReadStore;
 });

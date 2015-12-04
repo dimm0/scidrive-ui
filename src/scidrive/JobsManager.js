@@ -10,11 +10,10 @@ define([
         "dojo/mouse",
         "dijit/Tooltip",
         "dojo/on",
-        "scidrive/OAuth",
         "dojo/text!./templates/JobsManager.html"
         ],
     function(declare, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin, connect, dom, Memory, ObjectStore, 
-    	mouse, Tooltip, on, OAuth, template){
+    	mouse, Tooltip, on, template){
         return declare([WidgetBase, TemplatedMixin, WidgetsInTemplateMixin], {
 
         templateString: template,
@@ -34,50 +33,54 @@ define([
             this.inherited(arguments);
             
             var panel = this;
-            dojo.xhrGet(OAuth.sign("GET", {
-					url: this.transfers_url+"/info",
-					handleAs: "json",
-					load: function(data) {
-		    			var store = new Memory({
-							data: data
-						});
-		    			panel._supportingWidgets.push(store);
+            this.vospace.request(
+                this.transfers_url+"/info",
+                "GET", {
+                    handleAs: "json"
+                }
+            ).then(
+                function(data) {
+        			var store = new Memory({
+    					data: data
+    				});
+        			panel._supportingWidgets.push(store);
 
-		    		    panel.jobsgrid = new dojox.grid.DataGrid({
-		    		        store: ObjectStore({objectStore: store}),
-		    		        structure: panel.layout,
-		    		        rowSelector: '0px',
-		    		        onMouseOver: function(e) {
-		    		        	var item = e.grid.getItem(e.rowIndex);
-		    		        	if(e.cell.name == "state" && item.state == "ERROR"){
-									var jobQueryPath = "/"+item.id+"/error";
-									dojo.xhrGet(OAuth.sign("GET", {
-								        url: panel.transfers_url+jobQueryPath,
-								        handleAs: "text",
-								        sync: false,
-								        load: function(data) {
-								        	var node = e.target;
-											Tooltip.show(data, node);
-											  on.once(node, mouse.leave, function(){
-											      Tooltip.hide(node);
-											  })
-								        }
-								    },panel.vospace.credentials));
-		    		        	}
-		    		        }
-		    		    }, panel.jobsgridelm);
-		    		    
-		    			panel._supportingWidgets.push(panel.jobsgrid);
-		    		    panel.jobsgrid.startup();
-		    		    
-		    		    
-					},
-					error: function(error) {
-						alert("Error loading the jobs: "+error);
-					}
-				},this.vospace.credentials));
+        		    panel.jobsgrid = new dojox.grid.DataGrid({
+        		        store: ObjectStore({objectStore: store}),
+        		        structure: panel.layout,
+        		        rowSelector: '0px',
+        		        onMouseOver: function(e) {
+        		        	var item = e.grid.getItem(e.rowIndex);
+        		        	if(e.cell.name == "state" && item.state == "ERROR"){
+    							var jobQueryPath = "/"+item.id+"/error";
+                                panel.vospace.request(
+                                    panel.transfers_url+jobQueryPath,
+                                    "GET", {
+                                        handleAs: "text"
+                                    }
+                                ).then(
+                                    function(data) {
+    						        	var node = e.target;
+    									Tooltip.show(data, node);
+    									  on.once(node, mouse.leave, function(){
+    									      Tooltip.hide(node);
+    									  })
+    						        }
+    						    );
+        		        	}
+        		        }
+        		    }, panel.jobsgridelm);
+        		    
+        			panel._supportingWidgets.push(panel.jobsgrid);
+        		    panel.jobsgrid.startup();
+        		    
+        		    
+    			},
+    			function(error) {
+    				alert("Error loading the jobs: "+error);
+    			}
+            );
         }
-        
     });
         
         

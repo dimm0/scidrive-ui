@@ -10,11 +10,10 @@ define( [
     "dijit/form/ValidationTextBox",
     "dojox/layout/TableContainer",
     "scidrive/XMLWriter",
-    "scidrive/OAuth",
     "dojo/text!./templates/NewDirPanel.html"
 ],
 
-function(declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, on, keys, Form, Button, ValidationTextBox, TableContainer, XMLWriter, OAuth, template) {
+function(declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, on, keys, Form, Button, ValidationTextBox, TableContainer, XMLWriter, template) {
   return declare( "scidrive.NewDirPanel", [_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
     // summary:
     //      Widget building the form for new directory creation dialog
@@ -42,18 +41,21 @@ function(declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, on, key
       var writer = new XMLWriter();
       var nodeTemplate = writer.formatXml(writer.createNewNodeXml("ContainerNode", nodeid, this.current_panel.store.vospace.id));
 
-      dojo.xhrPut(scidrive.OAuth.sign("PUT", {
-       url: encodeURI(this.current_panel.store.vospace.url+"/nodes"+this.current_panel.gridWidget._currentPath+"/"+this.newContNodeName.get('value')),
-       putData: nodeTemplate,
-       headers: { "Content-Type": "application/xml"},
-       handleAs: "text",
-       load: function(data){
+      this.current_panel.store.vospace.request(
+          this.current_panel.store.vospace.url+"/nodes"+this.current_panel.gridWidget._currentPath+"/"+this.newContNodeName.get('value'),
+          "PUT", {
+            data: nodeTemplate,
+            headers: { "Content-Type": "application/xml"},
+            handleAs: "text"
+          }
+      ).then(
+        function(data){
           that.current_panel._refresh();
         },
-        error: function(data, ioargs) {
-          console.error(data);
+        function(error) {
+          console.error(error);
         }
-      }, this.current_panel.store.vospace.credentials));
+      );
 
       this.getParent().hide();
     },

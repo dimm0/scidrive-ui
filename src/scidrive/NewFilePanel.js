@@ -11,11 +11,10 @@ define( [
     "dijit/focus",
     "dojox/layout/TableContainer",
     "scidrive/XMLWriter",
-    "scidrive/OAuth",
     "dojo/text!./templates/NewFilePanel.html"
 ],
 
-function(declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, on, keys, Form, Button, ValidationTextBox, focusUtil, TableContainer, XMLWriter, OAuth, template) {
+function(declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, on, keys, Form, Button, ValidationTextBox, focusUtil, TableContainer, XMLWriter, template) {
     return declare( "scidrive.NewFilePanel", [_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
         // summary:
         //      Widget building the form for new file creation dialog
@@ -56,8 +55,7 @@ function(declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, on, key
           
           var cur_panel = this.current_panel;
           if(this.urlInput.get('value') !== ""){
-            cur_panel.store.pullToVoJob(cur_panel.store.vospace,
-              cur_panel.store.getNodeVoId(cur_panel.gridWidget._currentPath+"/"+fileName),
+            cur_panel.store.pullToVoJob(cur_panel.store.getNodeVoId(cur_panel.gridWidget._currentPath+"/"+fileName),
               this.urlInput.get('value'));
           } else { // create empty file
             if(cur_panel.gridWidget._currentPath == '/' && !cur_panel.store.vospace.isShare) {
@@ -66,18 +64,21 @@ function(declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, on, key
               var writer = new XMLWriter();
               var nodeid = cur_panel.store.getNodeVoId(cur_panel.gridWidget._currentPath+"/"+this.newDataNodeName.get('value'));
               var nodeTemplate = writer.formatXml(writer.createNewNodeXml("DataNode", nodeid, cur_panel.store.vospace.id));
-              dojo.xhrPut(OAuth.sign("PUT", {
-                url: encodeURI(cur_panel.store.vospace.url+"/nodes"+cur_panel.gridWidget._currentPath+"/"+this.newDataNodeName.get('value')),
-                putData: nodeTemplate,
-                headers: { "Content-Type": "application/xml"},
-                handleAs: "text",
-                load: function(data){
+              cur_panel.store.vospace.request(
+                  encodeURI(cur_panel.store.vospace.url+"/nodes"+cur_panel.gridWidget._currentPath+"/"+this.newDataNodeName.get('value')),
+                  "PUT", {
+                    data: nodeTemplate,
+                    headers: { "Content-Type": "application/xml"},
+                    handleAs: "text"
+                  }
+              ).then(
+                function(data){
                   cur_panel._refresh();
                 },
-                error: function(data, ioargs) {
-                  cur_panel._handleError(data, ioargs);
+                function(error) {
+                  cur_panel._handleError(error);
                 }
-              }, cur_panel.store.vospace.credentials));
+              );
             }
           }
           this.getParent().hide();

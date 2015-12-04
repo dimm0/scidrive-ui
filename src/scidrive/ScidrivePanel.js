@@ -1,4 +1,4 @@
-define([
+﻿define([
   "dojo/_base/declare", 
   "dojo/_base/array", 
   "dojo/_base/lang",
@@ -10,7 +10,6 @@ define([
   "dojo/fx/Toggler",
   "dojo/fx",
   "dojo/data/ItemFileWriteStore",
-  "dojo/request/xhr",
   "dijit/_WidgetBase",
   "dijit/_TemplatedMixin",
   "dijit/_WidgetsInTemplateMixin",
@@ -28,7 +27,6 @@ define([
   "dijit/form/CheckBox",
   "dijit/Dialog",
   "dojox/layout/TableContainer",
-  "scidrive/OAuth",
   "scidrive/FilePanel",
   "scidrive/DataGrid",
   "scidrive/VosyncReadStore",
@@ -36,14 +34,14 @@ define([
   "scidrive/DynamicPropertiesForm",
   "scidrive/NewFilePanel",
   "scidrive/NewDirPanel",
-  "numeral/numeral",
+  "scidrive/AccountSettings",
   "dojox/grid/DataGrid",
   "dojo/text!./templates/ScidrivePanel.html"
   ],
-  function(declare, array, lang, query, domStyle, domConstruct, keys, on, Toggler, coreFx, ItemFileWriteStore, xhr, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin,
+  function(declare, array, lang, query, domStyle, domConstruct, keys, on, Toggler, coreFx, ItemFileWriteStore, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin,
     BorderContainer, TabContainer, ContentPane, Toolbar, Tooltip, ProgressBar, Button, Select, MultiSelect, ToggleButton, TextBox, CheckBox, Dialog, TableContainer,
-    OAuth, FilePanel, DataGrid, VosyncReadStore, JobsManager, DynamicPropertiesForm, NewFilePanel, NewDirPanel, numeral, DojoDataGrid, template) {
-    return declare("scidrive.ScidrivePanel", [WidgetBase, TemplatedMixin, WidgetsInTemplateMixin], {
+    FilePanel, DataGrid, VosyncReadStore, JobsManager, DynamicPropertiesForm, NewFilePanel, NewDirPanel, AccountSettings, DojoDataGrid, template) {
+    return declare([WidgetBase, TemplatedMixin, WidgetsInTemplateMixin], {
         templateString: template,
 
         panel1: null,
@@ -114,6 +112,7 @@ define([
             hideFunc: coreFx.wipeOut
           });
           this.uploadPanelToggler.hide();
+            // this._showSettingsManagerDialog();
         },
 
         _mkdirDialog: function() {
@@ -160,10 +159,13 @@ define([
 
         _sharesDialog: function() {
           var panel = this;
-          dojo.xhrGet(OAuth.sign("GET", {
-              url: this.current_panel.store.vospace.url + "/1/shares",
-              handleAs: "json",
-              load: function(shares) {
+          this.current_panel.store.vospace.request(
+              this.current_panel.store.vospace.url + "/1/shares",
+              "GET", {
+                  'handleAs': "json"
+              }
+          ).then(
+            function(shares) {
 
                 var sharesGridDiv = domConstruct.create("div", {
                   style: {height: '400px'}
@@ -194,21 +196,24 @@ define([
                       var rowdata = this.grid.getItem(rowIndex);
                       var share_id = rowdata['share_id'];
                       var w = new Button({
-                        label: "⌫",
+                        label: "&#10060;",
                         iconClass: "deleteShareButton",
                         showLabel: true,
                         onClick: function(item) {
                           if (confirm("Remove share?")){
-
-                            dojo.xhrDelete(OAuth.sign("DELETE", {
-                                url: panel.current_panel.store.vospace.url + "/1/shares/"+share_id,
-                                load: function(data) {
-                                  store.deleteItem(rowdata); 
-                                },
-                                error: function(data, ioargs) {
-                                  panel.current_panel._handleError(data, ioargs);
-                                }
-                            }, panel.current_panel.store.vospace.credentials));
+                            panel.current_panel.store.vospace.request(
+                              panel.current_panel.store.vospace.url + "/1/shares/"+share_id,
+                              "DELETE", {
+                                  'handleAs': "json"
+                              }
+                            ).then(
+                              function(data) {
+                                store.deleteItem(rowdata); 
+                              },
+                              function(error) {
+                                panel.current_panel._handleError(data, ioargs);
+                              }
+                            );
                           }
                         }
                     });
@@ -254,10 +259,10 @@ define([
                 dlg.show();
                 dojo.setSelectable(grid.id, true);
               },
-              error: function(data, ioargs) {
-                panel.current_panel._handleError(data, ioargs);
+              function(error) {
+                panel.current_panel._handleError(error);
               }
-          }, this.current_panel.store.vospace.credentials));
+          );
 
           //this.sharesDialog.show();
         },
@@ -289,8 +294,8 @@ define([
                   progress: accountInfo.quota_info.normal
                 });
 
-                var tooltipText = numeral(accountInfo.quota_info.normal).format('0.0 b')+
-                " of "+numeral(accountInfo.quota_info.quota).format('0.0 b')+" used";
+                var tooltipText = accountInfo.quota_info.normal.fileSize(1)+
+                " of "+accountInfo.quota_info.quota.fileSize(1)+" used";
                 panel.userLimitTooltip.set("label", tooltipText);
                 dijit.Tooltip.defaultPosition=['below-centered'];
                 panel.userLimitTooltip.set("connectId",panel.userLimitBar.id);
@@ -312,6 +317,8 @@ define([
                 this.secondPanelButton.destroyRecursive();
               if(this.setCasJobsCredentialsButton)
                 this.setCasJobsCredentialsButton.destroyRecursive();
+              if(this.openCasJobsButton)
+                this.openCasJobsButton.destroyRecursive();
               if(this.sharesButton)
                 this.sharesButton.destroyRecursive();
               if(this.jobsPanelButton)
@@ -320,46 +327,43 @@ define([
 
             var panel = this;
 
-            if(!vospace.credentials) {
-                this.app.login(vospace, component, true);
-            } else {
-                if(component != null) {
-                    var store = this.createStore(vospace);
-                    store.parentPanel = component;
-                    component.setStore(store);
-                    this._updateUserInfo();
-                    this._refreshRegions();
-                } else { // init
-                    if(undefined == this.panel1) {
-                        this.panel1 = new FilePanel({
-                            login: this.loginToVO,
-                            store: this.createStore(vospace),
-                            parentPanel: this
-                            }).placeAt(this.panel1contentpane);
-                        this.panel1.store.parentPanel = this.panel1;
-                        this.updateCurrentPanel(this.panel1);
-                    } else {
-                        dojo.byId(this.panel2contentpane.id).style.width = "50%";
-                        this.rootContainer.resize();
-                        this.panel2 = new FilePanel({
-                            login: this.loginToVO,
-                            store: this.createStore(vospace),
-                            style: {height: "100%"},
-                            parentPanel: this
-                            }).placeAt(this.panel2contentpane);
-                        this.panel2.store.parentPanel = this.panel2;
-                        this.updateCurrentPanel(this.panel2);
-                        this.panel1.gridWidget.resize();
-                    }
-                }
-            }
-        },
-
-        createStore: function(vospace) {
-            return new scidrive.VosyncReadStore({
+            var store = new VosyncReadStore({
                 vospace: vospace,
                 numRows: "items"
             });
+
+            if(!vospace.credentials) {
+                vospace.login(component, true);
+            } else {
+              if(component != null) {
+                  store.parentPanel = component;
+                  component.setStore(store);
+                  this._updateUserInfo();
+                  this._refreshRegions();
+              } else { // init
+                  if(undefined == this.panel1) {
+                      this.panel1 = new FilePanel({
+                          login: this.loginToVO,
+                          store: store,
+                          parentPanel: this
+                          }).placeAt(this.panel1contentpane);
+                      this.panel1.store.parentPanel = this.panel1;
+                      this.updateCurrentPanel(this.panel1);
+                  } else {
+                      dojo.byId(this.panel2contentpane.id).style.width = "50%";
+                      this.rootContainer.resize();
+                      this.panel2 = new FilePanel({
+                          login: this.loginToVO,
+                          store: store,
+                          style: {height: "100%"},
+                          parentPanel: this
+                          }).placeAt(this.panel2contentpane);
+                      this.panel2.store.parentPanel = this.panel2;
+                      this.updateCurrentPanel(this.panel2);
+                      this.panel1.gridWidget.resize();
+                  }
+              }
+            }
         },
 
         /* Returns the list of region options for regions select */
@@ -410,9 +414,14 @@ define([
 
         _search: function() {
           var panel = this;
-          dojo.xhrGet(OAuth.sign("GET", {
-              url: panel.current_panel.store.vospace.url + "/1/cont_search?query="+this.searchInput.value,
-              load: function(data) {
+
+          this.vospace.request(
+            panel.current_panel.store.vospace.url + "/1/cont_search?query="+this.searchInput.value,
+            "GET", {
+                'handleAs': "json"
+            }
+          ).then(
+              function(data) {
                 var dlg = new dijit.Dialog({
                   title: "Search results",
                   content: data,
@@ -424,11 +433,11 @@ define([
                 dlg.show();
 
               },
-              error: function(data, ioargs) {
-                panel.current_panel._handleError(data, ioargs);
+              function(error) {
+                panel.current_panel._handleError(error);
               }
 
-          }, panel.current_panel.store.vospace.credentials));
+          );
         },
 
         hideUploadPanel: function() {
@@ -481,16 +490,37 @@ define([
       
         },
 
-        _showProcessManagerDialog: function() {
-          var panel = this;
-          panel.current_panel.getUserInfo(function(userInfo) {
-            var tabContainer = new TabContainer({
-                    doLayout: false,
-                    tabPosition: "left-h",
-                    style: "height: 500px; width: 800px;",
-                    tabStrip: true
-                });
+        _showSettingsManagerDialog: function() {
 
+          var set = new TabContainer({
+            style: "width: 100%; height: 500px;"
+          });
+          set.startup();
+
+          var dialog = new Dialog({
+            title: "Settings",
+            style: "width: 95%; height: 560px;",
+            onHide: function() {
+              this.destroyRecursive();
+            }
+
+          });
+          dialog.addChild(set);
+
+
+          var that = this;
+
+          var tabContainer = new TabContainer({
+            doLayout: false,
+            tabPosition: "left-h",
+            //style: "height: 800px; width: 100%;",
+            tabStrip: true,
+            title: "Metadata extractors"
+          });
+
+          set.addChild(tabContainer);
+
+          that.current_panel.getUserInfo(function(userInfo) {
             userInfo.services.map(function(service) {
               var cp = new ContentPane({
                   title: ((service.enabled)?'✔ ':'✘ ')+service.title,
@@ -498,45 +528,51 @@ define([
 
                     var form = new DynamicPropertiesForm({
                       style: "height: 100%; width: 100%",
-                      panel: panel,
+                      panel: that,
                       service: service,
                       save: function(jsonValues) {
                         if(this.onOffButton.get("value") == "on") {
-                          dojo.xhrPut(OAuth.sign("PUT", {
-                            url: panel.current_panel.store.vospace.url +"/1/account/service/"+service.id,
-                            putData: jsonValues,
-                            headers: { "Content-Type": "application/json"},
-                            handleAs: "text",
-                            load: function(data) {
+                          this.panel.current_panel.store.vospace.request(
+                              this.panel.current_panel.store.vospace.url +"/1/account/service/"+service.id,
+                              "PUT", {
+                                  'handleAs': "text",
+                                  data: jsonValues,
+                                  headers: { "Content-Type": "application/json"}
+                              }
+                          ).then(
+                            function(data) {
                               cp.set("title",'✔'+cp.get("title").substring(1));
                               service.enabled = true;
                             },
-                            error: function(data, ioargs) {
-                              panel.current_panel._handleError(data, ioargs);
+                            function(error) {
+                              this.panel.current_panel._handleError(data, ioargs);
                             }
 
-                          }, panel.current_panel.store.vospace.credentials));
+                          );
                         } else {
-                          dojo.xhrDelete(OAuth.sign("DELETE", {
-                            url: panel.current_panel.store.vospace.url +"/1/account/service/"+service.id,
-                            handleAs: "text",
-                            load: function(data) {
+                          this.panel.current_panel.store.vospace.request(
+                              this.panel.current_panel.store.vospace.url +"/1/account/service/"+service.id,
+                              "DELETE", {
+                                  'handleAs': "text",
+                                  data: jsonValues,
+                                  headers: { "Content-Type": "application/json"}
+                              }
+                          ).then(
+                            function(data) {
                               cp.set("title",'✘'+cp.get("title").substring(1));
                               service.enabled = false;
                             },
-                            error: function(data, ioargs) {
-                              panel.current_panel._handleError(data, ioargs);
+                            function(error) {
+                              this.panel.current_panel._handleError(data, ioargs);
                             }
 
-                          }, panel.current_panel.store.vospace.credentials));
-
+                          );
                         }
 
                       }
                     });
 
                     this.addChild(form);
-                    form.startup();
                   },
                   onHide: function() {
                     this.destroyDescendants();
@@ -544,16 +580,19 @@ define([
               });
               tabContainer.addChild(cp);
             });
-
-            var dialog = new Dialog({
-                title: "Metadata extractors configuration",
-                content: tabContainer,
-                onHide: function() {
-                  this.destroyRecursive();
-                }
-            });
-            dialog.show();
           });
+
+          var accountSettingsPanel = new AccountSettings({
+            title: "Account",
+            panel: this
+          });
+          accountSettingsPanel.startup();
+          set.addChild(accountSettingsPanel);
+
+          dialog.startup();
+          dialog.show();
+
+
         }
     });
 

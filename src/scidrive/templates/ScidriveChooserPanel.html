@@ -1,0 +1,17 @@
+<div>
+	<div data-dojo-type="dijit/layout/BorderContainer" style="min-width: 300px; width: 100%; height: 100%; margin-left:auto;
+margin-right:auto;" data-dojo-props="gutters:false" data-dojo-attach-point="rootContainer">
+	    <div data-dojo-type="dijit.layout.ContentPane" data-dojo-props="class:'topPanel', region:'top'">
+	    	<div data-dojo-attach-point="toolbar" data-dojo-type="dijit.Toolbar" data-dojo-props="class:'topToolbar'" style="width: 96%">
+				<span data-dojo-attach-point="pathSelect2" style="float: left; font-size: 1.2em; font-weight: 600; color: #326eb7;">
+				</span>
+				<button data-dojo-type="dijit/form/Button" type="button" data-dojo-attach-point="selectButton" style="float: right;" data-dojo-props="class:'toolbarShadedButton'">Select file
+				</button>
+			</div>
+		</div>
+	    <div data-dojo-props="region:'center'" data-dojo-type="dijit/layout/ContentPane" data-dojo-attach-point="panel1contentpane">
+	    </div>
+	</div>
+	<div data-dojo-type="dijit.layout.ContentPane" data-dojo-attach-point="fileuploads" data-dojo-props="class:'fileUploadPanel'">
+	</div>
+</div>

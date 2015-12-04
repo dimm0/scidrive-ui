@@ -1,99 +1,93 @@
-define(["dojox/grid/EnhancedGrid", "dojo/_base/declare", "dojo/_base/array", "dojo/_base/lang", "dojo/_base/html"], 
-          function(EnhancedGrid, declare, array, lang, html) {
-    var DataGrid =  declare("scidrive.DataGrid", [EnhancedGrid], {
-    	
-	_currentPath : '/',
-    _eventSource: null,
+define(["gridx/Grid", "dojo/_base/declare", "dojo/_base/array", "dojo/_base/lang", "dojo/_base/html"],
+function(GridX, declare, array, lang, html) {
+    var DataGrid =  declare("scidrive.DataGrid", [GridX], {
 
-    _fetch: function(start, isRender){
-        // summary:
-        //      Overwritten, see DataGrid._fetch()
-        if(this.items){
-            return this.inherited(arguments);
-        }
-        start = start || 0;
-        if(this.store && !this._pending_requests[start]){
-            if(!this._isLoaded && !this._isLoading){
-                this._isLoading = true;
-                this.showMessage(this.loadingMessage);
-            }
-            this._pending_requests[start] = true;
-            try{
-                var req = {
-                    start: start,
-                    count: this.rowsPerPage,
-                    query: this.query,
-                    sort: this.getSortProps(),
-                    queryOptions: this.queryOptions,
-                    isRender: isRender,
-                                path: this._currentPath,
+        _currentPath : '/',
+        _eventSource: null,
 
-                    onBegin: lang.hitch(this, "_onFetchBegin"),
-                    onComplete: lang.hitch(this, "_onFetchComplete"),
-                    onError: lang.hitch(this, "_onFetchError")
-                };
-                this._storeLayerFetch(req);
-            }catch(e){
-                this._onFetchError(e, {start: start, count: this.rowsPerPage});
-            }
-        }
-        return 0;
-    },
-
-	setCurrentPath: function(path) {
-        this._currentPath = path;
-		this.plugin('selector').clear();
-		this._refresh(true);
-        this._updateEventSource();
-	},
-	
-    setUser: function(user) {
-        if(this._user != user) {
-            this._user = user;
+        setCurrentPath: function(path) {
+            this.query.path = path;
+            this._currentPath = path;
+            this.model.clearCache();
+            this.body.refresh();
             this._updateEventSource();
-        }
-    },
+        },
 
-    _updateEventSource: function() {
+        setUser: function(user) {
+            if(this._user != user) {
+                this._user = user;
+                this._updateEventSource();
+            }
+        },
 
-        var panel = this;
-
-        if(null != this._eventSource) {
-          this._eventSource.close();
-          this._eventSource = null;
-        }
-
-        if(typeof this._user != undefined && !!window.EventSource) {
-
-            var shareRootPath = (this.store.vospace.isShare)?"/.*":"";
-
-            var parser = document.createElement('a');
-            parser.href = this.store.vospace.url;
-             
-            this._eventSource = new EventSource('//'+parser.host+'/updates?user='+this._user+'&path='+shareRootPath+this._currentPath);
-            
-            this._eventSource.onmessage = function(e) {
-              panel.plugin('selector').clear();
-              panel._refresh(true);
+        _throttle: function(func, wait, options) {
+            var context, args, result;
+            var timeout = null;
+            var previous = 0;
+            if (!options) options = {};
+            var later = function() {
+              previous = options.leading === false ? 0 : new Date().getTime();
+              timeout = null;
+              result = func.apply(context, args);
+              if (!timeout) context = args = null;
             };
-            this._eventSource.onerror = function(e) {
-                panel._eventSource.close();
-                panel._eventSource = null;
+            return function() {
+              var now = new Date().getTime();
+              if (!previous && options.leading === false) previous = now;
+              var remaining = wait - (now - previous);
+              context = this;
+              args = arguments;
+              if (remaining <= 0 || remaining > wait) {
+                if (timeout) {
+                  clearTimeout(timeout);
+                  timeout = null;
+                }
+                previous = now;
+                result = func.apply(context, args);
+                if (!timeout) context = args = null;
+              } else if (!timeout && options.trailing !== false) {
+                timeout = setTimeout(later, remaining);
+              }
+              return result;
             };
+          },
+
+        _updateEventSource: function() {
+
+            var that = this;
+
+            if(null != this._eventSource) {
+                this._eventSource.close();
+                this._eventSource = null;
+            }
+
+            if(typeof this._user != undefined && !!window.EventSource) {
+
+                var shareRootPath = (this.store.vospace.isShare)?"/.*":"";
+
+                var parser = document.createElement('a');
+                parser.href = this.store.vospace.url;
+
+                var refresh = this._throttle(function(e) {
+                        that.model.clearCache();
+                        that.body.refresh();
+                    }, 3000)
+
+                that.store.vospace.request(encodeURI(that.store.vospace.url+"/updates?path="+that.query.path),
+                    "GET").then(function(data){
+                        that._eventSource = new EventSource(that.store.vospace.url+'/updates/'+data);
+                        that._eventSource.onmessage = refresh;
+                        that._eventSource.onerror = function(e) {
+                            console.debug(e);
+                            that._eventSource.close();
+                            that._eventSource = null;
+                        };
+                    }
+                );
+            }
         }
-    },
 
-	setStore: function(store) {
-		var oldStore = this.store;
-		this._currentPath = "/";
-		this.inherited("setStore", arguments);
-		if(null != oldStore){
-			oldStore.close();
-		}
-	}
-
-  	
-	});
+    });
 
     return DataGrid;
 });

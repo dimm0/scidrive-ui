@@ -7,8 +7,6 @@
 @import "../dojox/widget/Dialog/Dialog.css";
 @import "../dojox/mobile/themes/iphone/Switch.css";
 @import "../dojox/form/resources/CheckedMultiSelect.css";
-@import "../gridx/resources/claro/Gridx.css";
-@import "//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css";
 
 html, body {
 	width: 100%;
@@ -16,6 +14,7 @@ html, body {
 	margin: 0;
 	border: 0;
 	padding: 0;
+	background: url("resources/interface/sd_logo.png") no-repeat fixed center;
 }
 
 .center {
@@ -39,7 +38,7 @@ html, body {
 
 .topPanel {
 	background: url("resources/interface/toolbar_bg.png") repeat-x scroll left top #EAEAEA;
-	height: 90px;
+	height: 55px;
 	margin: 0px;
 }
 
@@ -57,36 +56,32 @@ html, body {
 }
 
 .dijitToolbar.topToolbar {
- 	position: absolute;
-    right: 0px;
-    top: 35px;
+ 	position: relative;
+    top: 10px;
     background: none;
     border: 0px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .dijitToolbar.bottomToolbar, .bottomPanel {
 	background: url("resources/interface/toolbar_bg2.png") repeat-x scroll left top #EAEAEA;
 	background-size: 1px 45px;
-	height: 45px;
+	height: 25px;
 	border-bottom: none;
 }
 
-/*Border around the header*/
-.scidrive .gridxHeader .gridxHeaderRowInner, .scidrive .gridxHeader .gridxHeaderRow {
-	border:none;
+.scidrive .dojoxGrid {
+	font-family: inherit;
+	font-size: 1em;
+	background: rgba(255, 255, 255, 0.8); 
+	/*border-right: 2px solid #e7e8e9;*/
+	-webkit-user-select: none;
+	user-select: none;
 }
-
-/*Single cell selection*/
-.scidrive .gridx .gridxBody .gridxCellFocus {
-	border-bottom: none !important;
-	border-top: none !important;
-	border-left: 2px solid #e7e8e9 !important;
-	border-right: none !important;
-}
-
 
 /* Grid header img */
-.scidrive .gridxHeader .gridxHeaderRowInner .gridxCell {
+.scidrive .dojoxGridHeader .dojoxGridCell {
 	background: url("resources/interface/tabEnabled.png") repeat-x scroll center top #E9E9E9;
 	color: #58595b !important;
 	border-left: 2px solid white !important;
@@ -95,17 +90,13 @@ html, body {
 	border-right: none;
 }
 
-.scidrive .gridxRowTable .gridxCell {
+/* Regular grid cell text font */
+.scidrive .dojoxGridCell, .scidrive .dojoxGridCellFocus, .dojoxGridCellFocus {
 	color: #414141;
 	border-bottom: none;
 	border-top: none;
 	border-left: 2px solid #e7e8e9;
 	border-right: none;
-	height: 24px;
-}
-
-.scidrive .gridx {
-	border: 1px white;
 }
 
 /* Remove lines on the left of grid */
@@ -114,37 +105,18 @@ html, body {
 	border: none;
 }
 
+/* All cells white */
+.scidrive .dojoxGridRowOdd, .scidrive .dojoxGridRow {
+	background-color: transparent;
+}
+
 /* No label in orange progress bar */
 .scidrive .dijitProgressBarLabel {
 	visibility: hidden;
 }
 
-.scidrive .dijitProgressBarTile {
-	background-image: linear-gradient(left , rgb(246,176,26) 0%, rgb(234,101,44) 100%);
-	background-image: -o-linear-gradient(left , rgb(246,176,26) 0%, rgb(234,101,44) 100%);
-	background-image: -moz-linear-gradient(left , rgb(246,176,26) 0%, rgb(234,101,44) 100%);
-	background-image: -webkit-linear-gradient(left , rgb(246,176,26) 0%, rgb(234,101,44) 100%);
-	background-image: -ms-linear-gradient(left , rgb(246,176,26) 0%, rgb(234,101,44) 100%);
-
-	background-image: -webkit-gradient(
-		linear,
-		left top,
-		right top,
-		color-stop(0, rgb(246,176,26)),
-		color-stop(1, rgb(234,101,44))
-	);
-
-}
-
-.scidrive .dijitProgressBarEmpty {
-	border-style: solid;
-	border-width: 2px 3px;
-    border-image:url("resources/interface/progress_shadow.png") 5 fill round;
-    -moz-border-image:url("resources/interface/progress_shadow.png") 5 fill round; /* Firefox */
-    -webkit-border-image:url("resources/interface/progress_shadow.png") 5 round; /* Safari */
-    -o-border-image:url("resources/interface/progress_shadow.png") 5 round; /* Opera */
-
-
+.scidrive .dojoxGridScrollbox {
+	background-color: transparent;
 }
 
 .dijitSelect .dijitButtonText, .tundra td.dijitMenuItemLabel {padding: 3px;}
@@ -159,43 +131,6 @@ html, body {
 
 .hover {background: lightgrey;}
 .errhover {background: red;}
-
-/* toolbar iconed button */
-.toolbarButton {
-	background-repeat: no-repeat;
-	background-size:48px 40px;
-	width: 48px;
-	height: 40px;
-	text-align: center;
-}
-
-.quickToolbarButton {
-	background-repeat: no-repeat;
-	background-size:22px 22px;
-	width: 22px;
-	height: 22px;
-	text-align: center;
-}
-
-.quickToolbarButtonBase .dijitButtonNode {
-	border: none;
-	background: none;
-	padding: 0px;
-}
-
-.quickToolbarSpan {
-	position: relative;
-	float: right;
-	display: none;
-	top: 0;
-	z-index: 10;
-	overflow: visible;
-	background-color: rgba(206,232,242,0.9);
-}
-
-.gridxRowOver .quickToolbarSpan {
-	display: block;
-}
 
 /* text button padding remove */
 .dijitInline.toolbarShadedButton.dijitButton, .dijitStretch.dijitButtonContents, .dijitReset.dijitInputField.dijitButtonText {
@@ -281,51 +216,6 @@ html, body {
 
 .pathelm {
 	cursor: pointer;
-}
-
-.refreshToolbarButton {background-image: url(resources/interface/refresh_btn.gif)}
-.mkdirToolbarButton {background-image: url(resources/interface/mkdir_btn.gif)}
-.mkfileToolbarButton {background-image: url(resources/interface/mkfile_btn.gif)}
-.linkToolbarButton {background-image: url(resources/interface/link_btn.gif)}
-.settingsToolbarButton {background-image: url(resources/interface/settings_btn.png)}
-.casjobsToolbarButton {background-image: url(resources/interface/sdss3_logo.png)}
-.secpanToolbarButton {background-image: url(resources/interface/2nd_pan_btn.gif)}
-.jobsToolbarButton {background-image: url(resources/interface/jobs_btn.png)}
-
-span.share:before {
-	content: "\f1e0";
-	font-family: FontAwesome;
-	color: rgb(50,110,183);
-}
-
-span.meta:before {
-	content: "\f05a";
-	font-family: FontAwesome;
-	color: rgb(50,110,183);
-}
-
-span.link:before {
-	content: "\f08e";
-	font-family: FontAwesome;
-	color: rgb(50,110,183);
-}
-
-span.preview:before {
-	content: "\f06e";
-	font-family: FontAwesome;
-	color: rgb(50,110,183);
-}
-
-span.download:before {
-	content: "\f019";
-	font-family: FontAwesome;
-	color: rgb(50,110,183);
-}
-
-span.delete:before {
-	content: "\f1f8";
-	font-family: FontAwesome;
-	color: rgb(50,110,183);
 }
 
 .ConfirmDialog .dijitDialogPaneContentArea {

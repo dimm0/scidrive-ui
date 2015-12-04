@@ -4,7 +4,7 @@ require({
 		'dojo',
 		'dijit',
 		'dojox',
-		{ name: 'scidrive', location: 'scidrive', map: {} },
-		{ name: 'numeral', location: 'numeral', map: {} }
+		'gridx',
+		{ name: 'scidrive', location: 'scidrive', map: {} }
 	]
 }, [ 'scidrive' ]);

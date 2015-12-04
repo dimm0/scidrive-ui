@@ -12,23 +12,22 @@ define( [
 "dojo/on",
 "dojo/dom-form",
 "dojox/mobile/Switch",
-"scidrive/OAuth",
 "dojo/data/ItemFileReadStore",
 "dojox/form/CheckedMultiSelect"
 ],
 
-function(declare, Form, TextBox, Button, ToggleButton, ContentPane, BorderContainer, domConstruct, domStyle, xhr, on, domForm, Switch, OAuth, ItemFileReadStore, CheckedMultiSelect) {
-    return declare( "scidrive.DynamicPropertiesForm", Form, {
+function(declare, Form, TextBox, Button, ToggleButton, ContentPane, BorderContainer, domConstruct, domStyle, xhr, on, domForm, Switch, ItemFileReadStore, CheckedMultiSelect) {
+    return declare( Form, {
 
         constructor: function(args) {
             declare.safeMixin(this, args);
             this.form_fields = [];
         },
 
-        postCreate: function() {
+        startup: function() {
             var form = this;
             var panel = this.panel;
-            var bc = new BorderContainer({style: "height: 491px; width: 500px;", gutters: false});
+            var bc = new BorderContainer({style: "height: 480px; width: 100%", gutters: false});
 
             var cp_head = new ContentPane({
               region: "center", 
@@ -62,16 +61,13 @@ function(declare, Form, TextBox, Button, ToggleButton, ContentPane, BorderContai
                 cp_head.addChild(cp_form);
 
                 var url = panel.current_panel.store.vospace.url + "/1/account/service/" + form.service.id;
-                xhr(url, {
-                    handleAs: 'json',
-                    headers: {
-                        'Authorization': OAuth.sign(
-                            "GET", 
-                            {url: url}, 
-                            panel.current_panel.store.vospace.credentials)
-                        .headers["Authorization"]
+
+                panel.current_panel.store.vospace.request(
+                    url,
+                    "GET", {
+                        handleAs: "json"
                     }
-                }).then(function(service_cred) {
+                ).then(function(service_cred) {
                     if(schema.fields.length > 0) {
                         schema.fields.map(function(property) {
                             var propertyTextBox = new TextBox({
@@ -101,16 +97,12 @@ function(declare, Form, TextBox, Button, ToggleButton, ContentPane, BorderContai
                     domConstruct.place("<div style='padding: 3px;'>Enable extraction in containers:</div>", cont_form.id);
 
                     var url = panel.current_panel.store.vospace.url + "/1/metadata/sandbox/";
-                    xhr(url, {
-                        handleAs: "json",
-                        headers: {
-                            'Authorization': OAuth.sign(
-                                "GET", 
-                                {url: url}, 
-                                panel.current_panel.store.vospace.credentials)
-                            .headers["Authorization"]
+                    panel.current_panel.store.vospace.request(
+                        url,
+                        "GET", {
+                            handleAs: "json"
                         }
-                    }).then(function(root_contents) {
+                    ).then(function(root_contents) {
                         var data = {
                           identifier: "path",
                           label: "path",
