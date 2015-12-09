@@ -353,16 +353,15 @@
                       this.updateCurrentPanel(this.panel1);
                   } else {
                       dojo.byId(this.panel2contentpane.id).style.width = "50%";
-                      this.rootContainer.resize();
                       this.panel2 = new FilePanel({
                           login: this.loginToVO,
                           store: store,
-                          style: {height: "100%"},
                           parentPanel: this
                           }).placeAt(this.panel2contentpane);
                       this.panel2.store.parentPanel = this.panel2;
                       this.updateCurrentPanel(this.panel2);
                       this.panel1.gridWidget.resize();
+                      this.rootContainer.resize();
                   }
               }
             }
