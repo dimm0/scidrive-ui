@@ -4,6 +4,7 @@
   "dojo/_base/lang",
   "dojo/query",
   "dojo/dom-style",
+  "dojo/dom-class",
   "dojo/dom-construct",
   "dojo/keys",
   "dojo/on",
@@ -39,7 +40,7 @@
   "dojox/grid/DataGrid",
   "dojo/text!./templates/ScidrivePanel.html"
   ],
-  function(declare, array, lang, query, domStyle, domConstruct, keys, on, Toggler, coreFx, ItemFileWriteStore, hash, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin,
+  function(declare, array, lang, query, domStyle, domClass, domConstruct, keys, on, Toggler, coreFx, ItemFileWriteStore, WidgetBase, TemplatedMixin, WidgetsInTemplateMixin,
     BorderContainer, TabContainer, ContentPane, Toolbar, Tooltip, ProgressBar, Button, Select, MultiSelect, ToggleButton, TextBox, CheckBox, Dialog, TableContainer,
     FilePanel, DataGrid, VosyncReadStore, JobsManager, DynamicPropertiesForm, NewFilePanel, NewDirPanel, AccountSettings, DojoDataGrid, template) {
     return declare([WidgetBase, TemplatedMixin, WidgetsInTemplateMixin], {
@@ -57,6 +58,12 @@
           var prev_panel = this.current_panel;
 
           this.current_panel = panel;
+
+          domClass.add(panel.domNode, "active");
+          if(prev_panel)
+            domClass.remove(prev_panel.domNode, "active");
+
+          console.debug(domClass.contains(panel.domNode, "active"));
 
           thisPanel = this;
           var path = this.current_panel.gridWidget._currentPath;

@@ -391,7 +391,7 @@ define([
                         }
                     });
 
-                    on(this, "mouseenter", function(e) {
+                    on(this, "click", function(e) {
                         this.parentPanel.updateCurrentPanel(this);
                     });
 
