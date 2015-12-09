@@ -53,6 +53,8 @@ function(declare, lang, fx, connect, coreFx, aspect, domConstruct, xhr, JSON, io
                     localStorage.setItem('vospace_oauth_s', JSON.stringify(identity));
                 } else {
                     identity = curIdentity;
+                    if(identity["useShare"])
+                      delete identity.useShare;
                 }
             } else {
                 try {
