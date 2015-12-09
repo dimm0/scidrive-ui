@@ -86,8 +86,8 @@ html, body {
 
 
 /* Grid header img */
-.scidrive .gridxHeader .gridxHeaderRowInner .gridxCell {
-	/*background: url("resources/interface/tabDisabled.png") repeat-x scroll center top #E9E9E9;*/
+.scidrive .inactive .gridxHeader .gridxHeaderRowInner .gridxCell {
+	background: #FAFAFA;
 	color: #B1B4BA !important;
 	border-left: 2px solid white !important;
 	border-top: none;
@@ -95,7 +95,7 @@ html, body {
 	border-right: none;
 }
 
-.scidrive .active .gridxHeader .gridxHeaderRowInner .gridxCell {
+.scidrive .gridxHeader .gridxHeaderRowInner .gridxCell {
 	background: url("resources/interface/tabEnabled.png") repeat-x scroll center top #E9E9E9;
 	color: #58595b !important;
 	border-left: 2px solid white !important;
