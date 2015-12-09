@@ -356,8 +356,7 @@ define([
 
                     this.gridWidget.dnd._dnd._source.onDropExternal = function(source, nodes, copy) {
                         for (var i = 0; i < nodes.length; i++) {
-
-                            var nodePath = domAttr.get(nodes[0], "rowid");
+                            var nodePath = domAttr.get(nodes[i], "rowid");
                             var nodeId = source.grid.store.getNodeVoId(nodePath);
 
                             var nodePathArray = nodePath.split('/');
