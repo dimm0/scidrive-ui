@@ -12,6 +12,7 @@ define([
         "dojo/dom-style",
         "dojo/dom-attr",
         "dojo/store/Memory",
+        "dojo/hash",
         "dijit/_WidgetBase",
         "scidrive/DataGrid",
         "dijit/Menu",
@@ -59,7 +60,7 @@ define([
 
         "scidrive/XMLWriter"
     ],
-    function(declare, connect, fx, Deferred, aspect, array, on, html, keys, domConstruct, domStyle, domAttr, Memory, WidgetBase,
+    function(declare, connect, fx, Deferred, aspect, array, on, html, keys, domConstruct, domStyle, domAttr, Memory, hash, WidgetBase,
         DataGrid, Menu, Lightbox, ConfirmDialog, MetadataViewer, TemplatedMixin, WidgetsInTemplateMixin, _ContentPaneResizeMixin, template, BorderContainer, ContentPane, _LayoutWidget,
         Form, Button, Select, CheckBox, ValidationTextBox, TextBox, Textarea,
         FilteringSelect, PopupMenuBarItem, DropDownMenu, InlineEditBox, Toolbar, TooltipDialog, ProgressBar, Dialog, registry, popup, dojox_Dialog, ItemFileWriteStore, TitlePane, Async,
@@ -290,12 +291,17 @@ define([
                                 }
                             ];
 
+                    var cur_path = hash();
+                    if(typeof cur_path == "undefined")
+                        cur_path = "/";
+
                     this.gridWidget = new DataGrid({
                         id: this.grid.id,
                         store: this.store,
                         cacheClass: Async,
                         structure: structure,
                         canSort: false,
+                        _currentPath: cur_path,
                         modules: [
                             Focus,
                             ColumnResizer,
@@ -309,7 +315,7 @@ define([
                         dndRowCanRearrange: false,
                         query: {
                             list: 'true',
-                            path: "/"
+                            path: cur_path
                         },
                         pathWidget: this.pathSelect,
                         onRowDblClick: function(e) {
@@ -317,6 +323,7 @@ define([
                             if (item.i.is_dir) {
                                 this.setCurrentPath(item.i.path);
                                 panel.parentPanel.updateCurrentPanel(panel);
+                                // hash(item.i.path);
                             } else {
                                 panel.store.vospace.request(
                                     encodeURI(panel.store.vospace.url + "/1/media/sandbox" + item.i.path),
@@ -341,6 +348,12 @@ define([
                         }
                     }, this.grid);
                     
+                    // connect.subscribe("/dojo/hashchange", this.gridWidget, function(value) {
+                    //     console.debug(this);
+                    //     this.setCurrentPath(value);
+                    //     panel.parentPanel.updateCurrentPanel(panel);
+                    // });
+
                     this.gridWidget.dnd._dnd._source.onDropExternal = function(source, nodes, copy) {
                         for (var i = 0; i < nodes.length; i++) {
 
