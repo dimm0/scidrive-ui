@@ -472,7 +472,7 @@ define([
                 var icon = "";
                 switch (row.icon) {
                     case "folder_public":
-                        icon = "<i class=\"fa fa-folder-o\" style=\"color: rgb(50,110,183)\"></i>&nbsp;";
+                        icon = "<i class=\"fa fa-folder\" style=\"color: rgb(50,110,183)\"></i>&nbsp;";
                         break;
                     case "file":
                         if(row.mime_type.indexOf("image") == 0)
