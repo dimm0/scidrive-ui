@@ -32,11 +32,11 @@ margin-right:auto;" data-dojo-props="gutters:false" data-dojo-attach-point="root
 	    	</div>
 			<div dojoType="dijit.ProgressBar" style="height: 4px; margin: 0px;" data-dojo-attach-point="userLimitBar"></div>
 			<div data-dojo-attach-point="toolbar2" data-dojo-type="dijit.Toolbar" data-dojo-props="class:'bottomToolbar'">
-				<img src="scidrive/resources/interface/dirs.png" style="height: 80%"/>
-				<span data-dojo-attach-point="pathSelect2" style="font-size: 1.2em; font-weight: 600; color: #326eb7; position: relative; bottom:5;">
-				</span>
-				<select data-dojo-attach-point="loginSelect" data-dojo-type="dijit.form.Select" data-dojo-props="class:'toolbarDropdown'" style="float: right; width: 260px;">
+				<select data-dojo-attach-point="loginSelect" data-dojo-type="dijit.form.Select" data-dojo-props="class:'toolbarDropdown'" style="position: absolute; right: 0px; width: 260px;">
 				</select>
+				<img src="scidrive/resources/interface/dirs.png" style="height: 80%"/>
+				<span data-dojo-attach-point="pathSelect2" style="font-size: 1.2em; font-weight: 600; color: #326eb7; bottom:5;">
+				</span>
 				<!--input data-dojo-attach-point="searchInput" type="text" data-dojo-type="dijit/form/TextBox" data-dojo-props="trim:true" style="float: right; width: 260px; margin-top: 10px;">
 				</input>
 				<span data-dojo-attach-point="searchButton" data-dojo-type="dijit/form/Button" data-dojo-attach-event="onClick:_search" style="float: right; margin-top: 15px;">Search</span-->
