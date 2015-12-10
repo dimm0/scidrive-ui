@@ -4,52 +4,44 @@
 		<p>To start using SciDrive, create a folder using the "Create folder" button. Double click a folder to view its contents.</p>
 		<p>Once you are inside a folder you can start uploading files by Drag-and-Dropping these to the browser window.</p>
 	</div>
-	<div dojoType="dijit.TitlePane" open="false" title="Data publication: Uploading files">
+	<div dojoType="dijit.TitlePane" open="false" title="Data publication: Uploading and managing files">
 		<div style="display: table;">
 			<div style="width:45%; display: table-cell; float: none; border: 1px;">
 				To upload, drag and drop one or multiple files from your local drive into your browser window.
 				<br/>(Folder uploading is not supported by browsers yet)<br/><img src="scidrive/resources/help/dnd.png"></img>
 			</div>
 			<div style="width:45%; display: table-cell; float: none; border: 1px;">
-				To pull any http URL contents into existing file, choose "Pull from URL..." from the file's context menu:
-				<br/><img src="scidrive/resources/help/Pull_from_URL.png"></img><br/>
+				To pull any http URL contents into existing file, choose "Create new file" <img src="scidrive/resources/interface/mkfile_btn.gif" height="35px"> from the menu and enter the file URL and filename if needed. If filename is not specified, the one from the URL will be used.</img><br/>
 				The data will be asynchronously downloaded by the service.
 			</div>
 		</div>
 		<p>You can only upload files into a folder. Uploading files to root is not permitted.</p>
-	</div>
-	<div dojoType="dijit.TitlePane" open="false" title="The interface">
-		<p>Files and folders have right-click context menu for operations on them.
-		<br/><img src="scidrive/resources/help/Download.png"></p>
 		<p>To select one or multiple files, left-click one file or drag over multiple files. These selected items can be drag-and-dropped between panels to organize the space and transfer files between remote locations.</p>
 		The panel is usually updated after user's operations. To manually refresh the contents, use Refresh toolbar button.<br/>
 		<img src="scidrive/resources/help/Refresh.png"></img>
 		</p>
 	</div>
 	<div dojoType="dijit.TitlePane" open="false" title="Accessing the data">
-		<p>A file can be downloaded by double-clicking on it. To download a file or folder with all its contents, right-click on it and choose Download from context menu. <br/><img src="scidrive/resources/help/Download.png"></img><br/>
+		<p>A file can be downloaded by double-clicking on it. Alternatively to download a file or folder with all its contents, click the <i class="fa fa-download"></i> download button. <br/>
 		Folders are downloaded as .tar archives.<br/>
-		Online Preview is available for files recognized as images.</p>
+		Online Preview is available for files recognized as images by clicking on <i class="fa fa-eye"></i> Preview button.</p>
 	</div>
 	<div dojoType="dijit.TitlePane" open="false" title="Data sharing">
-		<div dojoType="dijit.TitlePane" open="false" title="Quick share">
-			To get world-accessible link to a file or folder, choose "Quick Share URL..." from file or folder context menu<br/><img src="scidrive/resources/help/Share_URL.png"></img><br/>
-			Containers will be downloaded as .tar archives.
+		To get world-accessible permanent link to a file or folder, choose "Quick Share" <i class="fa fa-share"></i>
+ from file or folder menu<br/>
+		Folders will be downloaded as .tar archives.
+		<p>You can share a top-level container for read-only or read+write access by a group of users or by everyone. To do it click "Share" <i class="fa fa-share-alt"></i> menu item from the folder menu of a top-level folder.<br/>
+		The dialog allows choosing the predefined group for the share or make it public.<br/>
+		<img src="scidrive/resources/help/Share_dialog.png"></img></p>
+		<p>"Create the share" button opens the dialog with new share URL and ID. The URL provides Web view of the share.<br/>
+		<img src="scidrive/resources/help/Share_created.png"></img></p>
+		<div dojoType="dijit.TitlePane" open="false" title="Using share ID in console scripts">
+			The share ID can be used to provide access to the share for console scripts. To get the OAuth token for shared container, the "share" parameter should be added to request_token and authorize OAuth URLs:
+			<p><code>http://server/vospace-2.0/request_token?share=&lt;share_id&gt;</code></p>
+			<p><code>http://server/vospace-2.0/authorize?provider=vao&share=&lt;share_id&gt;</code></p>
+			When accessing the authorize URL with anonymous share ID, no user acton is needed. The URL can be queried by the script in automatic mode, as described here: <a href="https://github.com/dimm0/scidrive/wiki/Using-Dropbox-SDK" target="_blank">https://github.com/idies/scidrive/wiki/Using-Dropbox-SDK</a>
 		</div>
-		<div dojoType="dijit.TitlePane" open="false" title="Groups share">
-			<p>You can share a top-level container for read-only or read+write access by a group of users or by everyone. To access the share dialog, choose "Share" menu item from the context menu of top-level container.<br/>
-			<img src="scidrive/resources/help/Share.png"></img></p>
-			<p>The dialog allows choosing the predefined group for the share or make it public.<br/>
-			<img src="scidrive/resources/help/Share_dialog.png"></img></p>
-			<p>"Create the share" button opens the dialog with new share URL and ID. The URL provides Web view of the share.<br/>
-			<img src="scidrive/resources/help/Share_created.png"></img></p>
-			<div dojoType="dijit.TitlePane" open="false" title="Using share ID in console scripts">
-				The share ID can be used to provide access to the share for console scripts. To get the OAuth token for shared container, the "share" parameter should be added to request_token and authorize OAuth URLs:
-				<p><code>http://server/vospace-2.0/request_token?share=&lt;share_id&gt;</code></p>
-				<p><code>http://server/vospace-2.0/authorize?provider=vao&share=&lt;share_id&gt;</code></p>
-				When accessing the authorize URL with anonymous share ID, no user acton is needed. The URL can be queried by the script in automatic mode, as described here: <a href="https://github.com/dimm0/scidrive/wiki/Using-Dropbox-SDK" target="_blank">https://github.com/idies/scidrive/wiki/Using-Dropbox-SDK</a>
-			</div>
-		</div>
+		<p>The existing shares can be viewed and managed from share <i class="fa fa-share-alt"></i> top menu item.</p>
 	</div>
 	<div dojoType="dijit.TitlePane" open="false" title="Metadata extraction">
 		<p>The service provides automatic extraction of metadata from uploaded files in the background. Filetypes are automatically recognized by its contents signatures. For some filetypes there are plugins to extract metadata and store it in side services. The needed plugins should be enabled using the metadata exctractors configurator.</p>
@@ -66,13 +58,8 @@
 		</ul>
 	</div>
 	<div dojoType="dijit.TitlePane" open="false" title="REST API">
-		<p>The service supports both VOSpace 2.0 and Dropbox REST API to access the data.</p>
-		<div dojoType="dijit.TitlePane" open="false" title="VOSpace 2.0 API">
-			The specification can be found at <a href="http://www.ivoa.net/Documents/VOSpace/" target="_blank">http://www.ivoa.net/Documents/VOSpace</a>.
-			The service supports both X.509 certificate and OAuth+OpenID as Single Sign On preferred way of authentication.
-		</div>
-		<div dojoType="dijit.TitlePane" open="false" title="Dropbox API">
-			The specification can be found at <a href="https://www.dropbox.com/developers/reference/api" target="_blank">Dropbox API</a>. The service supports OAuth+OpenID as Single Sign On preferred way of authentication.
-		</div>
+		<p>The service supports both VOSpace 2.0 and Dropbox REST API to access the data.<br/>
+			The <b>VOSpace</b> specification can be found at <a href="http://www.ivoa.net/Documents/VOSpace/" target="_blank">http://www.ivoa.net/Documents/VOSpace</a>.<br/>
+			The <b>Dropbox</b> specification can be found at <a href="https://www.dropbox.com/developers/reference/api" target="_blank">Dropbox API</a>. The service supports OAuth+OpenID as Single Sign On preferred way of authentication.</p>
 	</div>
 </div>

@@ -176,6 +176,7 @@ html, body {
 	width: 48px;
 	height: 40px;
 	text-align: center;
+	color: rgb(50,110,183);
 }
 
 .quickToolbarButton {
@@ -295,7 +296,7 @@ html, body {
 .refreshToolbarButton {background-image: url(resources/interface/refresh_btn.gif)}
 .mkdirToolbarButton {background-image: url(resources/interface/mkdir_btn.gif)}
 .mkfileToolbarButton {background-image: url(resources/interface/mkfile_btn.gif)}
-.linkToolbarButton {background-image: url(resources/interface/link_btn.gif)}
+/*.linkToolbarButton {background-image: url(resources/interface/link_btn.gif)}*/
 .settingsToolbarButton {background-image: url(resources/interface/settings_btn.png)}
 .casjobsToolbarButton {background-image: url(resources/interface/sdss3_logo.png)}
 .secpanToolbarButton {background-image: url(resources/interface/2nd_pan_btn.gif)}
@@ -314,7 +315,7 @@ span.meta:before {
 }
 
 span.link:before {
-	content: "\f08e";
+	content: "\f064";
 	font-family: FontAwesome;
 	color: rgb(50,110,183);
 }
