@@ -8,7 +8,7 @@
 @import "../dojox/mobile/themes/iphone/Switch.css";
 @import "../dojox/form/resources/CheckedMultiSelect.css";
 @import "../gridx/resources/claro/Gridx.css";
-@import "//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css";
+@import "//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css";
 
 html, body {
 	width: 100%;
@@ -336,6 +336,12 @@ span.delete:before {
 	content: "\f1f8";
 	font-family: FontAwesome;
 	color: rgb(50,110,183);
+}
+
+span.share_toolbar:before {
+	content: "\f1e0";
+	font-family: FontAwesome;
+	font-size: 3em;
 }
 
 .ConfirmDialog .dijitDialogPaneContentArea {
