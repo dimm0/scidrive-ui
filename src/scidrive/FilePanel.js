@@ -118,16 +118,10 @@ define([
                                         else
                                             domStyle.set(cellWidget.preview_btn.domNode, 'display', 'inline');
 
-                                        if(panel.gridWidget._currentPath == '/')
+                                        if(panel.gridWidget._currentPath == '/' && !panel.store.vospace.isShare)
                                             domStyle.set(cellWidget.share_btn.domNode, 'display', 'inline');
                                         else
                                             domStyle.set(cellWidget.share_btn.domNode, 'display', 'none');
-
-                                        if(!panel.store.vospace.isShare) {
-                                            domStyle.set(cellWidget.share_btn.domNode, 'display', 'inline');
-                                        } else {
-                                            domStyle.set(cellWidget.share_btn.domNode, 'display', 'none');
-                                        }
                                     },
                                     getCellWidgetConnects: function(cellWidget, cell){
                                         return [
