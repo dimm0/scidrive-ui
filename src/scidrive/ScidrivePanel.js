@@ -59,9 +59,9 @@
 
           this.current_panel = panel;
 
-          domClass.remove(panel.domNode, "inactive");
-          if(prev_panel && prev_panel != panel)
-            domClass.add(prev_panel.domNode, "inactive");
+          // domClass.remove(panel.domNode, "inactive");
+          // if(prev_panel != panel && prev_panel !== null)
+          //   domClass.add(prev_panel.domNode, "inactive");
 
           thisPanel = this;
           var path = this.current_panel.gridWidget._currentPath;
@@ -365,8 +365,8 @@
                           }).placeAt(this.panel2contentpane);
                       this.panel2.store.parentPanel = this.panel2;
                       this.updateCurrentPanel(this.panel2);
-                      this.panel1.gridWidget.resize();
                       this.rootContainer.resize();
+                      this.panel1.gridWidget.resize();
                   }
               }
             }
