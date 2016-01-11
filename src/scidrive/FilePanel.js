@@ -296,6 +296,7 @@ define([
                         structure: structure,
                         canSort: false,
                         _currentPath: cur_path,
+                        columnWidthAutoResize: true,
                         modules: [
                             Focus,
                             ColumnResizer,
