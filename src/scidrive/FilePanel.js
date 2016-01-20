@@ -17,7 +17,7 @@ define([
         "scidrive/DataGrid",
         "dijit/Menu",
         "dojox/image/Lightbox",
-        "scidrive/ConfirmDialog",
+        "scidrive/ConfirmOverwriteDialog",
         "scidrive/MetadataViewer",
         "dijit/_TemplatedMixin",
         "dijit/_WidgetsInTemplateMixin",
@@ -61,7 +61,7 @@ define([
         "scidrive/XMLWriter"
     ],
     function(declare, connect, fx, Deferred, aspect, array, on, html, keys, domConstruct, domStyle, domAttr, Memory, hash, WidgetBase,
-        DataGrid, Menu, Lightbox, ConfirmDialog, MetadataViewer, TemplatedMixin, WidgetsInTemplateMixin, _ContentPaneResizeMixin, template, BorderContainer, ContentPane, _LayoutWidget,
+        DataGrid, Menu, Lightbox, ConfirmOverwriteDialog, MetadataViewer, TemplatedMixin, WidgetsInTemplateMixin, _ContentPaneResizeMixin, template, BorderContainer, ContentPane, _LayoutWidget,
         Form, Button, Select, CheckBox, ValidationTextBox, TextBox, Textarea,
         FilteringSelect, PopupMenuBarItem, DropDownMenu, InlineEditBox, Toolbar, TooltipDialog, ProgressBar, Dialog, registry, popup, dojox_Dialog, ItemFileWriteStore, TitlePane, Async,
         Focus, ColumnResizer, ExtendedSelectRow, VirtualVScroller, GridMenu, CellWidget, DnDRow, MoveRow, XMLWriter
@@ -571,6 +571,9 @@ define([
 
                 var curFileStruct = this._uploadFilesQueue.shift();
                 var url = encodeURI(curFileStruct.containerUrl + curFileStruct.file.name);
+                if(curFileStruct.overwrite !== null){
+                    url += "?overwrite="+curFileStruct.overwrite.toString();
+                }
 
                 var headers = curFileStruct.vospace.signRequest(url, "PUT").headers;
 
@@ -589,26 +592,70 @@ define([
                     }
                 };
 
-                on.once(xhr.upload, "loadend", function() {
-                    if (panel._uploadFilesQueue.length > 0) {
-                        panel._uploadFiles();
-                    } else {
-                        panel._isUploading = false;
-                        panel.parentPanel.hideUploadPanel();
-                    }
-                    domConstruct.destroy(curFileStruct.fileUploadNode);
-                    panel._refresh(true);
-                });
-
                 xhr.onreadystatechange = function(evt) {
                     if (this.readyState === 4) {
                         if (this.status === 200) {
-                            // upload is OK
+                            //all good
+                            if (panel._uploadFilesQueue.length > 0) {
+                                panel._uploadFiles();
+                            } else {
+                                panel._isUploading = false;
+                                panel.parentPanel.hideUploadPanel();
+                            }
                         } else {
-                            if (this.status === 403)
+                            if (this.status === 403) {
                                 alert("Can't upload the file: Read Only permissions");
-                            else
+                            } else if(this.status === ) {
+                                MessageBox.confirm({
+                                    "title":"Overwrite the file",
+                                    "message": "Overwrite "+curFileStruct.file.name+"?"
+                                }).then(function(evt) {
+                                    switch(evt){
+                                        case "MessageBox.OKAll":
+                                            var files = panel._uploadFilesQueue;
+                                            for (var i = 0; i < files.length; i++) {
+                                                var curFile = files[i];
+                                                curFile.overwrite = true;
+                                            }
+                                            panel._uploadFilesQueue.unshift(curFileStruct);
+                                            panel._uploadFiles();
+                                            break;
+                                        case "MessageBox.OK":
+                                            curFileStruct.overwrite = true;
+                                            panel._uploadFilesQueue.unshift(curFileStruct);
+                                            panel._uploadFiles();
+                                            break;
+                                        case "MessageBox.Cancel":
+                                            domConstruct.destroy(curFileStruct.fileUploadNode);
+                                            panel._refresh(true);
+                                            if (panel._uploadFilesQueue.length > 0) {
+                                                panel._uploadFiles();
+                                            } else {
+                                                panel._isUploading = false;
+                                                panel.parentPanel.hideUploadPanel();
+                                            }
+                                            break;
+                                        case "MessageBox.CancelAll":
+                                            var files = panel._uploadFilesQueue;
+                                            for (var i = 0; i < files.length; i++) {
+                                                var curFile = files[i];
+                                                curFile.overwrite = false;
+                                            }
+                                            domConstruct.destroy(curFileStruct.fileUploadNode);
+                                            panel._refresh(true);
+                                            if (panel._uploadFilesQueue.length > 0) {
+                                                panel._uploadFiles();
+                                            } else {
+                                                panel._isUploading = false;
+                                                panel.parentPanel.hideUploadPanel();
+                                            }
+                                            break;
+                                    }
+
+                                });
+                            } else {
                                 alert("Can't upload the file: " + this.statusText);
+                            }
                         }
                     }
                 };
@@ -668,7 +715,8 @@ define([
                                 fileUploadNode: uploadNode,
                                 fileProgressNode: progressNode,
                                 containerUrl: url,
-                                vospace: panel.store.vospace
+                                vospace: panel.store.vospace,
+                                overwrite: null
                             });
 
                             if (!panel._isUploading) {
