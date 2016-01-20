@@ -605,7 +605,7 @@ define([
                         } else {
                             if (this.status === 403) {
                                 alert("Can't upload the file: Read Only permissions");
-                            } else if(this.status === ) {
+                            } else if(this.status === 400) {
                                 MessageBox.confirm({
                                     "title":"Overwrite the file",
                                     "message": "Overwrite "+curFileStruct.file.name+"?"
