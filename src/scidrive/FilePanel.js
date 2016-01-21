@@ -190,7 +190,6 @@ define([
                                                 function(data) {
                                                     var lb = new dojox.image.LightboxDialog({
                                                         hide: function() {
-                                                            console.debug("DEstroy");
                                                             this.destroyRecursive();
                                                         }
                                                     }).startup();
