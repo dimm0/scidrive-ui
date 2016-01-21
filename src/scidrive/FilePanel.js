@@ -573,6 +573,8 @@ define([
                 var url = encodeURI(curFileStruct.containerUrl + curFileStruct.file.name);
                 if(curFileStruct.overwrite !== null){
                     url += "?overwrite="+curFileStruct.overwrite.toString();
+                } else {
+                    url += "?overwrite=false";
                 }
 
                 var headers = curFileStruct.vospace.signRequest(url, "PUT").headers;
@@ -594,8 +596,11 @@ define([
 
                 xhr.onreadystatechange = function(evt) {
                     if (this.readyState === 4) {
+                        console.debug(this.status);
                         if (this.status === 200) {
                             //all good
+                            domConstruct.destroy(curFileStruct.fileUploadNode);
+                            panel._refresh(true);
                             if (panel._uploadFilesQueue.length > 0) {
                                 panel._uploadFiles();
                             } else {
@@ -606,6 +611,17 @@ define([
                             if (this.status === 403) {
                                 alert("Can't upload the file: Read Only permissions");
                             } else if(this.status === 400) {
+                                if(curFileStruct.overwrite == false) { // got conflict for file marked as not overwrite. just continuing from here
+                                    domConstruct.destroy(curFileStruct.fileUploadNode);
+                                    panel._refresh(true);
+                                    if (panel._uploadFilesQueue.length > 0) {
+                                        panel._uploadFiles();
+                                    } else {
+                                        panel._isUploading = false;
+                                        panel.parentPanel.hideUploadPanel();
+                                    }
+                                    return;
+                                }
                                 MessageBox.confirm({
                                     "title":"Overwrite the file",
                                     "message": "Overwrite "+curFileStruct.file.name+"?"
@@ -617,6 +633,7 @@ define([
                                                 var curFile = files[i];
                                                 curFile.overwrite = true;
                                             }
+                                            curFileStruct.overwrite = true;
                                             panel._uploadFilesQueue.unshift(curFileStruct);
                                             panel._uploadFiles();
                                             break;
