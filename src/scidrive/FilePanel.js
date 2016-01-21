@@ -595,7 +595,6 @@ define([
 
                 xhr.onreadystatechange = function(evt) {
                     if (this.readyState === 4) {
-                        console.debug(this.status);
                         if (this.status === 200) {
                             //all good
                             domConstruct.destroy(curFileStruct.fileUploadNode);
