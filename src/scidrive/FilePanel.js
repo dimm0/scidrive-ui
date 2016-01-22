@@ -18,6 +18,7 @@ define([
         "dijit/Menu",
         "dojox/image/Lightbox",
         "scidrive/ConfirmOverwriteDialog",
+        "scidrive/ConfirmDialog",
         "scidrive/MetadataViewer",
         "dijit/_TemplatedMixin",
         "dijit/_WidgetsInTemplateMixin",
@@ -61,7 +62,7 @@ define([
         "scidrive/XMLWriter"
     ],
     function(declare, connect, fx, Deferred, aspect, array, on, html, keys, domConstruct, domStyle, domAttr, Memory, hash, WidgetBase,
-        DataGrid, Menu, Lightbox, ConfirmOverwriteDialog, MetadataViewer, TemplatedMixin, WidgetsInTemplateMixin, _ContentPaneResizeMixin, template, BorderContainer, ContentPane, _LayoutWidget,
+        DataGrid, Menu, Lightbox, ConfirmOverwriteDialog, ConfirmDialog, MetadataViewer, TemplatedMixin, WidgetsInTemplateMixin, _ContentPaneResizeMixin, template, BorderContainer, ContentPane, _LayoutWidget,
         Form, Button, Select, CheckBox, ValidationTextBox, TextBox, Textarea,
         FilteringSelect, PopupMenuBarItem, DropDownMenu, InlineEditBox, Toolbar, TooltipDialog, ProgressBar, Dialog, registry, popup, dojox_Dialog, ItemFileWriteStore, TitlePane, Async,
         Focus, ColumnResizer, ExtendedSelectRow, VirtualVScroller, GridMenu, CellWidget, DnDRow, MoveRow, XMLWriter
@@ -620,12 +621,12 @@ define([
                                     }
                                     return;
                                 }
-                                MessageBox.confirm({
+                                OverwriteMessageBox.confirm({
                                     "title":"Overwrite the file",
                                     "message": "Overwrite "+curFileStruct.file.name+"?"
                                 }).then(function(evt) {
                                     switch(evt){
-                                        case "MessageBox.OKAll":
+                                        case "OverwriteMessageBox.OKAll":
                                             var files = panel._uploadFilesQueue;
                                             for (var i = 0; i < files.length; i++) {
                                                 var curFile = files[i];
@@ -635,12 +636,12 @@ define([
                                             panel._uploadFilesQueue.unshift(curFileStruct);
                                             panel._uploadFiles();
                                             break;
-                                        case "MessageBox.OK":
+                                        case "OverwriteMessageBox.OK":
                                             curFileStruct.overwrite = true;
                                             panel._uploadFilesQueue.unshift(curFileStruct);
                                             panel._uploadFiles();
                                             break;
-                                        case "MessageBox.Cancel":
+                                        case "OverwriteMessageBox.Cancel":
                                             domConstruct.destroy(curFileStruct.fileUploadNode);
                                             panel._refresh(true);
                                             if (panel._uploadFilesQueue.length > 0) {
@@ -650,7 +651,7 @@ define([
                                                 panel.parentPanel.hideUploadPanel();
                                             }
                                             break;
-                                        case "MessageBox.CancelAll":
+                                        case "OverwriteMessageBox.CancelAll":
                                             var files = panel._uploadFilesQueue;
                                             for (var i = 0; i < files.length; i++) {
                                                 var curFile = files[i];

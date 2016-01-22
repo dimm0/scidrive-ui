@@ -79,7 +79,7 @@ define([
     
     });
 
-    MessageBox = {
+    OverwriteMessageBox = {
         confirm: function(kwArgs) {
             var confirmDialog = new ConfirmDialog(kwArgs);
             confirmDialog.startup();
@@ -96,25 +96,25 @@ define([
             
             signal = aspect.after(confirmDialog, "onExecute", function() {
                 destroyDialog();
-                deferred.resolve('MessageBox.OK');
+                deferred.resolve('OverwriteMessageBox.OK');
             });
             signals.push(signal);
         
             signal = aspect.after(confirmDialog, "onCancel", function() {
                 destroyDialog();   
-                deferred.resolve('MessageBox.Cancel');            
+                deferred.resolve('OverwriteMessageBox.Cancel');            
             });
             signals.push(signal);
 
             signal = aspect.after(confirmDialog, "onExecuteAll", function() {
                 destroyDialog();
-                deferred.resolve('MessageBox.OKAll');
+                deferred.resolve('OverwriteMessageBox.OKAll');
             });
             signals.push(signal);
         
             signal = aspect.after(confirmDialog, "onCancelAll", function() {
                 destroyDialog();   
-                deferred.resolve('MessageBox.CancelAll');   
+                deferred.resolve('OverwriteMessageBox.CancelAll');   
             });
             signals.push(signal);
             
@@ -124,6 +124,6 @@ define([
        };
 
 
-    return MessageBox;
+    return OverwriteMessageBox;
 
 });
