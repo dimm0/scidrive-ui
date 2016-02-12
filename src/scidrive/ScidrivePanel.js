@@ -59,9 +59,9 @@
 
           this.current_panel = panel;
 
-          // domClass.remove(panel.domNode, "inactive");
-          // if(prev_panel != panel && prev_panel !== null)
-          //   domClass.add(prev_panel.domNode, "inactive");
+          domClass.remove(panel.domNode, "inactive");
+          if(prev_panel != panel && prev_panel !== null)
+            domClass.add(prev_panel.domNode, "inactive");
 
           thisPanel = this;
           var path = this.current_panel.gridWidget._currentPath;
