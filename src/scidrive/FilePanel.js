@@ -286,7 +286,7 @@ define([
                             ];
 
                     var cur_path = hash();
-                    if(typeof cur_path == "undefined")
+                    if(typeof cur_path == "undefined" || cur_path == "")
                         cur_path = "/";
 
                     this.gridWidget = new DataGrid({
