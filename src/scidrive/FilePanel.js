@@ -130,7 +130,7 @@ define([
 
 
                                             panel.store.vospace.request(
-                                                encodeURI(panel.store.vospace.url + "/1/media/sandbox" + cell.row.id),
+                                                panel.encodeFileURI(panel.store.vospace.url + "/1/media/sandbox" + cell.row.id),
                                                 "GET", {
                                                     handleAs: "json"
                                                 }
@@ -183,7 +183,7 @@ define([
                                           }],
                                           [cellWidget.preview_btn, 'onMouseDown', function(e){
                                             panel.store.vospace.request(
-                                                encodeURI(panel.store.vospace.url + "/1/media/sandbox" + cell.row.id),
+                                                panel.encodeFileURI(panel.store.vospace.url + "/1/media/sandbox" + cell.row.id),
                                                 "GET", {
                                                     handleAs: "json"
                                                 }
@@ -206,7 +206,7 @@ define([
                                           }],
                                           [cellWidget.download_btn, 'onMouseDown', function(e){
                                             panel.store.vospace.request(
-                                                encodeURI(panel.store.vospace.url + "/1/media/sandbox" + cell.row.id),
+                                                panel.encodeFileURI(panel.store.vospace.url + "/1/media/sandbox" + cell.row.id),
                                                 "GET", {
                                                     handleAs: "json"
                                                 }
@@ -286,7 +286,7 @@ define([
                                 // hash(item.i.path);
                             } else {
                                 panel.store.vospace.request(
-                                    encodeURI(panel.store.vospace.url + "/1/media/sandbox" + item.i.path),
+                                    panel.encodeFileURI(panel.store.vospace.url + "/1/media/sandbox" + item.i.path),
                                     "GET", {
                                         handleAs: "json"
                                     }
@@ -382,7 +382,7 @@ define([
                     if (path instanceof Array) {
                         for (var i = 0; i < path.length; i++) {
                             panel.store.vospace.request(
-                                encodeURI(panel.store.vospace.url + "/nodes" + path[i]),
+                                panel.encodeFileURI(panel.store.vospace.url + "/nodes" + path[i]),
                                 "DELETE", {
                                     handleAs: "text"
                                 }
@@ -398,7 +398,7 @@ define([
 
                     } else {
                         panel.store.vospace.request(
-                            encodeURI(panel.store.vospace.url + "/nodes" + path),
+                            panel.encodeFileURI(panel.store.vospace.url + "/nodes" + path),
                             "DELETE", {
                                 handleAs: "text"
                             }
@@ -468,7 +468,7 @@ define([
                 var panel = this;
 
                 panel.store.vospace.request(
-                    encodeURI(this.store.vospace.url + "/nodes/" + path),
+                    this.encodeFileURI(this.store.vospace.url + "/nodes/" + path),
                     "GET", {
                         handleAs: "xml"
                     }
@@ -535,7 +535,7 @@ define([
                 this._isUploading = true;
 
                 var curFileStruct = this._uploadFilesQueue.shift();
-                var url = encodeURI(curFileStruct.containerUrl + curFileStruct.file.name);
+                var url = panel.encodeFileURI(curFileStruct.containerUrl + curFileStruct.file.name);
                 if(curFileStruct.overwrite !== null){
                     url += "?overwrite="+curFileStruct.overwrite.toString();
                 } else {
@@ -718,7 +718,7 @@ define([
                 var panel = this;
 
                 panel.store.vospace.request(
-                    encodeURI(panel.store.vospace.url + "/1/shares/sandbox"+this.chooseShareGroupDialog.nodepath+"?write_perm=" + !this.readOnlyCheckBox.checked),
+                    panel.encodeFileURI(panel.store.vospace.url + "/1/shares/sandbox"+this.chooseShareGroupDialog.nodepath)+"?write_perm=" + !this.readOnlyCheckBox.checked,
                     "PUT", {
                         handleAs: "json"
                     }
@@ -743,6 +743,12 @@ define([
                         panel._handleError(error);
                     }
                 );
+            },
+
+            encodeFileURI: function(url) {
+                var filename = url.substring(url.lastIndexOf('/')+1);
+                var path = url.substring(0,url.lastIndexOf('/')+1);
+                return encodeURI(path)+encodeURIComponent(filename);
             },
 
             _handleError: function(error) {
