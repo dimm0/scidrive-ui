@@ -227,46 +227,11 @@ define([
 
                                           }],
                                           [cellWidget.share_btn, 'onMouseDown', function(e) {
-                                            panel.store.vospace.request(
-                                                encodeURI(panel.store.vospace.url + "/1/share_groups"),
-                                                "GET", {
-                                                    handleAs: "json"
-                                                }
-                                            ).then(
-                                                function(data) {
-                                                    var sharesStore = new Memory({data: data});
+                                            panel.chooseShareGroupDialog.nodepath = cell.row.id;
+                                            panel.chooseShareGroupDialog.startup();
 
-                                                    panel.shareSelect.store = sharesStore;
-                                                    connect.connect(panel.shareSelect, "onChange", function(e) {
-                                                        panel.store.vospace.request(
-                                                            encodeURI(panel.store.vospace.url + "/1/share_groups/" + cell.row.id),
-                                                            "GET", {
-                                                                handleAs: "json"
-                                                            }
-                                                        ).then(
-                                                            function(data) {
-                                                                domConstruct.empty(panel.usersList);
-                                                                data.forEach(function(item, num) {
-                                                                    var userDiv = dojo.create("div", {
-                                                                        innerHTML: item
-                                                                    });
-                                                                    domConstruct.place(userDiv, panel.usersList);
-                                                                });
-
-                                                            },
-                                                            function(error) {
-                                                                panel._handleError(error);
-                                                            }
-                                                        );
-                                                    });
-
-                                                    panel.chooseShareGroupDialog.nodepath = cell.row.id;
-                                                    panel.chooseShareGroupDialog.startup();
-
-                                                    // reset the dialog if necessary
-                                                    panel.chooseShareGroupDialog.show();
-                                                }
-                                            );
+                                            // reset the dialog if necessary
+                                            panel.chooseShareGroupDialog.show();
                                           }]
                                         ];
                                     },
@@ -745,30 +710,20 @@ define([
             },
 
             _createShareKey: function(e) {
-                if (this.shareSelect.validate()) { // proper group name
-                    this.chooseShareGroupDialog.hide();
-                    this._createShare();
-                }
+                this.chooseShareGroupDialog.hide();
+                this._createShare();
             },
 
             _createShare: function(e) {
                 var panel = this;
-                var params = "";
-
-                if (this.groupEnable.value == "on")
-                    params += "?group=" + this.shareSelect.value;
-
-                params += (params == "") ? "?" : "&";
-                params += "write_perm=" + !this.readOnlyCheckBox.checked;
 
                 panel.store.vospace.request(
-                    encodeURI(panel.store.vospace.url + "/1/shares/sandbox" + this.chooseShareGroupDialog.nodepath + params),
+                    encodeURI(panel.store.vospace.url + "/1/shares/sandbox"+this.chooseShareGroupDialog.nodepath+"?write_perm=" + !this.readOnlyCheckBox.checked),
                     "PUT", {
                         handleAs: "json"
                     }
                 ).then(
                     function(data) {
-
                         var url = location.protocol + '//' + location.host + location.pathname;
                         var infoContent = "<p>Share URL: <a href='" + url + "?share=" + data.id + "'' target='_blank'>" + url + "?share=" + data.id + "</a></p>\n";
                         infoContent += "<p align='center'>Share id: <span style='background: #e3e3e3; padding: 5px;'>" + data.id + " </span></p>"
@@ -788,49 +743,6 @@ define([
                         panel._handleError(error);
                     }
                 );
-            },
-
-            _enableShareGroup: function(e) {
-                var panel = this;
-
-                domStyle.set(this.usersListDiv, "display", "block");
-                var anim = fx.animateProperty({
-                    node: this.usersList,
-                    properties: {
-                        height: {
-                            end: 150
-                        }
-                    }
-                });
-                aspect.after(anim, "onEnd", function() {
-                    panel.groupEnable.value = "on";
-                    panel.shareSelect.setDisabled(false);
-                    panel.shareSelect.loadAndOpenDropDown();
-                    //panel.shareSelect.reset();
-                }, true);
-                anim.play();
-
-            },
-
-            _disableShareGroup: function(e) {
-                var panel = this;
-                this.shareSelect.closeDropDown();
-                var anim = fx.animateProperty({
-                    node: this.usersList,
-                    properties: {
-                        height: {
-                            end: 0
-                        }
-                    }
-                });
-                aspect.after(anim, "onEnd", function() {
-                    domStyle.set(panel.usersListDiv, "display", 'none');
-                    panel.groupEnable.value = "off";
-                    panel.shareSelect.setDisabled(true);
-                    //domConstruct.empty(panel.usersList);
-                }, true);
-                anim.play();
-
             },
 
             _handleError: function(error) {
