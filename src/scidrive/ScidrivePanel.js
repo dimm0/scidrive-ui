@@ -53,6 +53,8 @@
         uploadPanelToggler: null,
         uploadPanelTogglerState: false,
 
+        MAX_PATH_ELMS:5,
+
         updateCurrentPanel: function(panel) {
 
           var prev_panel = this.current_panel;
@@ -68,26 +70,46 @@
           hash(path);
           var pathTokens = path.split('/');
 
-          function elmToHref(element, index, array){
-              if(index > 0)
-                  return "<span class='pathelm' name='"+element+"'>"+element+"</span>";
-              else
-                  return "<span class='pathelm' name=''>Root</span>";
-          }
+          var pathHtml = pathTokens.map(function(element, index, array){
+                if(index > 0) {
+                    if(element.length <= 15)
+                      return "<span class='pathelm' name='"+element+"'>"+element+"</span>";
+                    else
+                      return "<span class='pathelm' name='"+element+"' title='"+element+"'>"+element.slice(0,14)+"...</span>";
+                } else {
+                    return "<span class='pathelm' name=''>Root</span>";
+                }
+            }
+          );
 
-          var pathHtml = pathTokens.map(elmToHref);
+          var pathOnClick = pathTokens.map(function(element, index, array){
+                var path = pathTokens.slice(0,index+1).join("/");
+                if(path.length == 0)
+                    path = "/";
+                return path;
+            }
+          );
+
+          while(pathHtml.length > this.MAX_PATH_ELMS) {
+            if(pathHtml.length == this.MAX_PATH_ELMS+1) {
+              pathHtml[1] = "<span class='pathelm' name=''>...</span>";
+              break;
+            } else {
+              pathHtml.splice(1,1);
+              pathOnClick.splice(1,1);
+            }
+          }
 
           var curPath = pathHtml.join(" ▸ ");
           this.pathSelect2.innerHTML = curPath;
 
+          var that = this;
           query(".pathelm").forEach(function(item, num) {
               item.onclick = function(evt) {
-                  var path = pathTokens.slice(0,num+1).join("/");
-                  if(path.length == 0)
-                      path = "/";
-                  thisPanel.current_panel._updateStore(path);
+                  that.panel1._updateStore(pathOnClick[num]);
               };
           });
+
 
           if(prev_panel != panel) {
               this._updateUserInfo();
