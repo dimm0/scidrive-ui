@@ -106,7 +106,7 @@
           var that = this;
           query(".pathelm").forEach(function(item, num) {
               item.onclick = function(evt) {
-                  that.panel1._updateStore(pathOnClick[num]);
+                  thisPanel.current_panel._updateStore(pathOnClick[num]);
               };
           });
 
