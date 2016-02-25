@@ -431,6 +431,8 @@
             if(this.panel2 == undefined) {
                 this.loginToVO(this.panel1.store.vospace, null);
             } else {
+                this.panel2.gridWidget._eventSource.close();
+                this.panel2.gridWidget._eventSource = null;
                 this.panel2.destroyRecursive();
                 this.panel2 = null;
                 dojo.byId(this.panel2contentpane.id).style.width = "0%";
