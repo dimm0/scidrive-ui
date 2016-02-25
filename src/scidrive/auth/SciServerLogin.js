@@ -65,9 +65,11 @@ define([
         login: function(component) {
             var curUrl = location.protocol + '//' + location.host + location.pathname;
             if(this.isShare) {
-                curUrl += encodeURIComponent((curUrl.indexOf('?')>0)?'&':'?'+
-                    'share='+this.id);
-                document.location.href = curUrl;
+                console.debug("Shouldn't be here");
+                //curUrl += encodeURIComponent((curUrl.indexOf('?')>0)?'&':'?'+
+                //    'share='+this.id);
+                //if(document.location.href != curUrl)
+                //    document.location.href = curUrl;
                 return;
             }
             document.location.href = this.loginPortalUrl+'?callbackUrl='+curUrl;

@@ -27,7 +27,6 @@ function(declare, lang, fx, connect, coreFx, aspect, domConstruct, xhr, JSON, io
         constructor: function(args) {
             declare.safeMixin(this, args);
 
-            /* console.log((186457865).fileSize()); */
             Object.defineProperty(Number.prototype,'fileSize',{value:function(a,b,c,d){
              return (a=a?[1e3,'k','B']:[1024,'K','iB'],b=Math,c=b.log,
              d=c(this)/c(a[0])|0,this/b.pow(a[0],d)).toFixed(2)
@@ -111,6 +110,8 @@ function(declare, lang, fx, connect, coreFx, aspect, domConstruct, xhr, JSON, io
               defaultReg.display = "Share";
               if(undefined != identity.regions[share]) {
                   defaultReg.credentials = identity.regions[share];
+              } else {
+                  defaultReg.credentials = {}; // allow shares with no credentials for now, since don't have groups
               }
               vospaces.push(defaultReg);
             }

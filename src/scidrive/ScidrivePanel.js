@@ -217,7 +217,7 @@
                   //{'name': 'Group', 'field': 'group', 'width': '23%'},
                   {'name': 'Write', 'field': 'write_permission', 'width': '10%', 
                     formatter: function(col, rowIndex) {
-                        return col?"✔":"✘";
+                        return (col=='true')?"✔":"✘";
                     }
                   },
                   {'name': 'Remove', 'field':'share_id', 'width':'12%', 
