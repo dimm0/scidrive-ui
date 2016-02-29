@@ -138,6 +138,9 @@ define([
             }
             param.method = method;
 
+            if(args)
+                param.query = ioQuery.objectToQuery(args.content);
+
             return param;
         }
 
