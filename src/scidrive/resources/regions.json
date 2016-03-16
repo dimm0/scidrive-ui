@@ -1,9 +1,9 @@
 [
 	{
-		"id":"scitest01",
+		"id":"scidev09",
 		"defaultRegion":true,
-		"url":"http://localhost:8080/vospace-2.0",
-		"display":"scitest01",
+		"url":"http://scidev09.pha.jhu.edu/vospace-2.0",
+		"display":"scidev09",
 		"auth": "sciserver"
 	}
 ]

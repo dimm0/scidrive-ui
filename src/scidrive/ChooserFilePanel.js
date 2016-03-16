@@ -664,8 +664,8 @@ define([
                     function(data) {
 
                         var url = location.protocol + '//' + location.host + location.pathname;
-                        var infoContent = "<p>Share URL: <a href='" + url + "?share=" + data.id + "'' target='_blank'>" + url + "?share=" + data.id + "</a></p>\n";
-                        infoContent += "<p align='center'>Share id: <span style='background: #e3e3e3; padding: 5px;'>" + data.id + " </span></p>"
+                        var infoContent = "<p>Copy the link: <a href='" + url + "?share=" + data.id + "'' target='_blank'>" + url + "?share=" + data.id + "</a></p>\n";
+                        //infoContent += "<p align='center'>Share id: <span style='background: #e3e3e3; padding: 5px;'>" + data.id + " </span></p>"
 
                         var infoWindow = new dijit.Dialog({
                             title: "Share URL",

@@ -3,7 +3,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="A free, easy-to-use data hosting and sharing service for the science community">
+    <meta name="description" content="A free, drag-and-drop file hosting and sharing service for the science community">
 
     <title>SciDrive of Johns Hopkins University</title>
 
@@ -19,10 +19,10 @@
 
     <div class="container">
       <div class="jumbotron">
-        <div style="float: right; margin-right: -30px; margin-top: -30px;"><h5><a href="mailto:dmedv@pha.jhu.edu">EMail contact</a></h5></div>
+        <div style="float: right; margin-right: -30px; margin-top: -30px;"><h5><a href="http://www.sciserver.org/collaboration/bug-report-and-suggestion-form/" target="_blank">Contact</a></h5></div>
         <p><img class="img-responsive" style="width: 250px;" src="scidrive/resources/interface/sd_logo.png" alt="SciDrive logo"/></p>
         <p>&nbsp;</p>
-        <h3 style="font-weight:500; color: #535353; line-height:150%">A free, easy-to-use data hosting and sharing service for the science community</h3>
+        <h3 style="font-weight:500; color: #535353; line-height:150%">A free, drag-and-drop file hosting and sharing service for the science community</h3>
         <p>&nbsp;</p>
         <div class="row">
           <div class="col-sm-4 col-sm-offset-4 vertical-padding">
@@ -32,30 +32,12 @@
       </div>
 
 
-      <p><h5 style="text-align: justify;">Drag-and-drop files to the browser window and we will not only store your data, but will also recognize the filetype, extract whatever metadata we can from your files.</h5></p>
+      <p><h5 style="text-align: justify;">Drag-and-drop files to the browser window.</h5></p>
+      <!--<p><h5 style="text-align: justify;">Drag-and-drop files to the browser window and we will not only store your data, but will also recognize the filetype, extract whatever metadata we can from your files.</h5></p>-->
 
-      <p><h5 style="text-align: justify;">If we find a tabular data set – we will automatically load it into a database table.</h5></p>
+      <!--<p><h5 style="text-align: justify;">If we find a tabular data set – we will automatically load it into a database table.</h5></p>-->
 
       <p><h5 style="text-align: justify;">Share your data with the scientific community by simply providing URLs that everyone can browse. Create a writeable share for your workgroup to analyze data together.</h5></p>
-
-      <div class="row marketing">
-        <h5>Supported by:</h5>
-        <div class="col-sm-3 vertical-padding">
-          <a href="http://www.sloan.org/"><img class="img-responsive" style="height: 40px; margin: 0 auto;" src="scidrive/resources/support/Sloan-Foundation.png"/></a>
-        </div>
-        <div class="col-sm-2 vertical-padding">
-          <a href="http://www.usvao.org/"><img class="img-responsive" style="height: 40px; margin: 0 auto;" src="scidrive/resources/vao_med.png"/></a>
-        </div>
-        <div class="col-sm-2 vertical-padding">
-          <a href="http://www.nsf.gov/"><img class="img-responsive" style="height: 40px; margin: 0 auto;" src="scidrive/resources/support/Nsf1.png"/></a>
-        </div>
-        <div class="col-sm-2 vertical-padding">
-          <a href="http://skyserver.sdss3.org/CasJobs/"><img class="img-responsive" style="height: 30px; margin: 0 auto;" src="scidrive/resources/support/sdss3shrunk.png"/><div style="text-align: center;">CasJobs/MyDB</div></a>
-        </div>
-        <div class="col-sm-2 col-sm-offset-1 vertical-padding">
-          <a href="http://escience.washington.edu/sqlshare" style="margin: 0 auto;"><img class="img-responsive" style="height: 30px; margin: 0 auto;" src="scidrive/resources/support/UW-W-Logo-RGB.png"/><div style="text-align: center;">SQLShare</div></a>
-        </div>
-      </div>
 
       <hr/>
 
@@ -84,10 +66,11 @@
       
       <h4>Frequently Asked Questions</h4>
       <b>How is the space allocated per user?</b>
-      <p>The suggested user quota is 1TB, not enforced. If more space is needed, it is recommended that you contact us to explain the purpose of using the storage.</p>
+      <p>The suggested user quota is 50GB, not enforced. If more space is needed, it is recommended that you contact us to explain the purpose of using the storage.</p>
 
       <b>What is the maximum supported file size?</b>
-      <p>The maximum file size is 5GB. Larger files can be uploaded in segmented mode using the Python client. Once uploaded, the file can be downloaded as a single file. The size for segmented uploads is not limited.</p>
+      <p>The maximum file size is 5GB.</p>
+	  <!--<p>The maximum file size is 5GB. Larger files can be uploaded in segmented mode using the Python client. Once uploaded, the file can be downloaded as a single file. The size for segmented uploads is not limited.</p>-->
 
       <b>What is the maximum supported number of files?</b>
       <p>The number of files is not limited. Single container can contain millions of files.</p>
@@ -95,8 +78,8 @@
       <b>How is the data kept private? Will somebody be able to see my data after I upload it?</b>
       <p>The data will be available to the owner only until some part of it is shared and the link is given to someone. The metadata extracted and uploaded to a 3rd party service will be handled according to the service policy.</p>
 
-      <b>The system searches for metadata in files, but this is only workable for reasonably standard-compliant and complete self-documenting formats. How does your system handle unknown file types?</b>
-      <p>A special plugin can be developed to handle such data if needed, otherwise nothing will be extracted from these files. You can limit the metadata extraction to containers where you have files in standard formats.</p>
+      <!--<b>The system searches for metadata in files, but this is only workable for reasonably standard-compliant and complete self-documenting formats. How does your system handle unknown file types?</b>
+      <p>A special plugin can be developed to handle such data if needed, otherwise nothing will be extracted from these files. You can limit the metadata extraction to containers where you have files in standard formats.</p>-->
 
     <div class="row marketing">
         <h5>Supports:</h5>
@@ -119,8 +102,29 @@
 
     </div>
 
+    <div class="row marketing">
+        <h5>Supported by:</h5>
+        <div class="col-sm-3 vertical-padding">
+          <a href="http://www.sloan.org/"><img class="img-responsive" style="height: 40px; margin: 0 auto;" src="scidrive/resources/support/Sloan-Foundation.png"/></a>
+        </div>
+        <div class="col-sm-2 vertical-padding">
+          <a href="http://www.usvao.org/"><img class="img-responsive" style="height: 40px; margin: 0 auto;" src="scidrive/resources/vao_med.png"/></a>
+        </div>
+        <div class="col-sm-2 vertical-padding">
+          <a href="http://www.nsf.gov/"><img class="img-responsive" style="height: 40px; margin: 0 auto;" src="scidrive/resources/support/Nsf1.png"/></a>
+        </div>
+        <div class="col-sm-2 vertical-padding">
+          <a href="http://skyserver.sdss3.org/CasJobs/"><img class="img-responsive" style="height: 30px; margin: 0 auto;" src="scidrive/resources/support/sdss3shrunk.png"/><div style="text-align: center;">CasJobs/MyDB</div></a>
+        </div>
+        <div class="col-sm-2 col-sm-offset-1 vertical-padding">
+          <a href="http://escience.washington.edu/sqlshare" style="margin: 0 auto;"><img class="img-responsive" style="height: 30px; margin: 0 auto;" src="scidrive/resources/support/UW-W-Logo-RGB.png"/><div style="text-align: center;">SQLShare</div></a>
+        </div>
+    </div>
+	
+	
+	
       <div class="footer">
-        <p>&copy; Johns Hopkins University 2013</p>
+        <p>&copy; Johns Hopkins University 2013-2016</p>
       </div>
 
     </div> <!-- /container -->

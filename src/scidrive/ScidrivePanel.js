@@ -1,4 +1,4 @@
-﻿define([
+define([
   "dojo/_base/declare", 
   "dojo/_base/array", 
   "dojo/_base/lang",
@@ -207,20 +207,20 @@
                 var store = new ItemFileWriteStore({data: data});
 
                 var layout = [[
-                  {'name': 'ID', 'field': 'share_id', 'width': '30%',
+                  {'name': 'Container', 'field': 'container', 'width': '20%'},
+                  //{'name': 'Group', 'field': 'group', 'width': '23%'},
+                  {'name': 'Shared URL', 'field': 'share_id', 'width': '47%',
                     formatter: function(col, rowIndex) {
                       var url = location.protocol + '//' + location.host + location.pathname;
-                      return "<a href=\""+url+"?share="+col+"\" target=\"_blank\">"+col+"</a>";
+                      return "<a href=\""+url+"?share="+col+"\" target=\"_blank\">"+url+"?share="+col+"</a>";
                     }
                   },
-                  {'name': 'Container', 'field': 'container', 'width': '25%'},
-                  //{'name': 'Group', 'field': 'group', 'width': '23%'},
-                  {'name': 'Write', 'field': 'write_permission', 'width': '10%', 
+                  {'name': 'Write', 'field': 'write_permission', 'width': '5%', 
                     formatter: function(col, rowIndex) {
                         return (col=='true')?"✔":"✘";
                     }
                   },
-                  {'name': 'Remove', 'field':'share_id', 'width':'12%', 
+                  {'name': 'Remove', 'field':'share_id', 'width':'5%', 
                     formatter: function(col, rowIndex) {
                       var rowdata = this.grid.getItem(rowIndex);
                       var share_id = rowdata['share_id'];
@@ -275,8 +275,8 @@
 
 
                 var dlg = new dijit.Dialog({
-                  title: "Containers Shares",
-                  style: "width: 680px; height: 450px",
+                  title: "Shared Containers",
+                  style: "width: 1020px; height: 560px",
                   content: grid,
                   autofocus: false,
                   onHide: function() {
@@ -627,3 +627,4 @@
     });
 
 });
+

@@ -10,16 +10,16 @@ margin-right:auto;" data-dojo-props="gutters:false" data-dojo-attach-point="root
 					</button>
 					<button data-dojo-type="dijit.form.Button" type="button" data-dojo-attach-point="mkdirButton" data-dojo-attach-event="onClick:_mkdirDialog" data-dojo-props="iconClass:'toolbarButton mkdirToolbarButton', showLabel: false">Create folder...
 					</button>
-					<button data-dojo-type="dijit.form.Button" type="button" data-dojo-attach-point="mkfileButton" data-dojo-attach-event="onClick:_mkfileDialog" data-dojo-props="iconClass:'toolbarButton mkfileToolbarButton', showLabel: false">Create file...
-					</button>
-					<button data-dojo-type="dijit.form.Button" type="button" data-dojo-attach-point="setCasJobsCredentialsButton" data-dojo-attach-event="onClick:_showSettingsManagerDialog" data-dojo-props="iconClass:'toolbarButton settingsToolbarButton', showLabel: false">Settings...
-					</button>
-					<button data-dojo-type="dijit.form.Button" type="button" data-dojo-attach-point="sharesButton" data-dojo-attach-event="onClick:_sharesDialog" data-dojo-props="iconClass:'toolbarButton share_toolbar', showLabel: false">Shares...
+<!--					<button data-dojo-type="dijit.form.Button" type="button" data-dojo-attach-point="mkfileButton" data-dojo-attach-event="onClick:_mkfileDialog" data-dojo-props="iconClass:'toolbarButton mkfileToolbarButton', showLabel: false">Create file...
+					</button>-->
+<!--					<button data-dojo-type="dijit.form.Button" type="button" data-dojo-attach-point="setCasJobsCredentialsButton" data-dojo-attach-event="onClick:_showSettingsManagerDialog" data-dojo-props="iconClass:'toolbarButton settingsToolbarButton', showLabel: false">Settings...
+					</button>-->
+					<button data-dojo-type="dijit.form.Button" type="button" data-dojo-attach-point="sharesButton" data-dojo-attach-event="onClick:_sharesDialog" data-dojo-props="iconClass:'toolbarButton share_toolbar', showLabel: false">Shared containers...
 					</button>
 					<button data-dojo-type="dijit.form.Button" type="button" data-dojo-attach-point="secondPanelButton" data-dojo-attach-event="onClick:_addPanel" data-dojo-props="iconClass:'toolbarButton secpanToolbarButton', showLabel: false">Second panel
 					</button>
-					<button data-dojo-type="dijit.form.Button" type="button" data-dojo-attach-point="jobsPanelButton" data-dojo-attach-event="onClick:_showJobsManagerDialog" data-dojo-props="iconClass:'toolbarButton jobsToolbarButton', showLabel: false">Jobs
-					</button>
+<!--					<button data-dojo-type="dijit.form.Button" type="button" data-dojo-attach-point="jobsPanelButton" data-dojo-attach-event="onClick:_showJobsManagerDialog" data-dojo-props="iconClass:'toolbarButton jobsToolbarButton', showLabel: false">Jobs
+					</button>-->
 					<img src="scidrive/resources/blank.gif" style="width:30px; height: 1px;"/>
 					<button data-dojo-type="dijit.form.Button" type="button" data-dojo-attach-point="helpButton" data-dojo-attach-event="onClick:_help" data-dojo-props="class:'toolbarShadedButton'">Help
 					</button>
@@ -30,7 +30,7 @@ margin-right:auto;" data-dojo-props="gutters:false" data-dojo-attach-point="root
 	    	</div>
 			<div dojoType="dijit.ProgressBar" style="height: 4px; margin: 0px;" data-dojo-attach-point="userLimitBar"></div>
 			<div data-dojo-attach-point="toolbar2" data-dojo-type="dijit.Toolbar" data-dojo-props="class:'bottomToolbar'">
-				<select data-dojo-attach-point="loginSelect" data-dojo-type="dijit.form.Select" data-dojo-props="class:'toolbarDropdown'" style="position: absolute; right: 0px; width: 260px;">
+			        <select data-dojo-attach-point="loginSelect" data-dojo-type="dijit.form.Select" data-dojo-props="class:'toolbarDropdown'" style="position: absolute; right: 0px; width: 260px; visibility:hidden;">
 				</select>
 				<img src="scidrive/resources/interface/dirs.png" style="height: 80%"/>
 				<span data-dojo-attach-point="pathSelect2" style="font-size: 1.2em; font-weight: 600; color: #326eb7; bottom:5;">

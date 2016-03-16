@@ -103,7 +103,7 @@ define([
                                         return "<span data-dojo-type='dijit.layout.ContentPane' style='position: relative; overflow: hidden;' data-dojo-attach-point='cell_cont' data-dojo-props='maximum: 1' class='gridxHasGridCellValue'>"+
                                                 "<span data-dojo-attach-point='textfield' style='width: 100%; white-space:nowrap; overflow: hidden'></span>"+
                                                 "<span class='quickToolbarSpan' style='position:absolute; right: 0px;'>"+
-                                                "<button data-dojo-type='dijit.form.Button' data-dojo-attach-point='link_btn' baseClass='quickToolbarButtonBase' data-dojo-props='iconClass:\"quickToolbarButton link\", showLabel: false'>External link</button>"+
+                                                "<button data-dojo-type='dijit.form.Button' data-dojo-attach-point='link_btn' baseClass='quickToolbarButtonBase' data-dojo-props='iconClass:\"quickToolbarButton link\", showLabel: false'>Download link</button>"+
                                                 "<button data-dojo-type='dijit.form.Button' data-dojo-attach-point='share_btn' baseClass='quickToolbarButtonBase' data-dojo-props='iconClass:\"quickToolbarButton share\", showLabel: false'>Share</button>"+
                                                 "<button data-dojo-type='dijit.form.Button' data-dojo-attach-point='meta_btn' baseClass='quickToolbarButtonBase' data-dojo-props='iconClass:\"quickToolbarButton meta\", showLabel: false'>Metadata</button>"+
                                                 "<button data-dojo-type='dijit.form.Button' data-dojo-attach-point='preview_btn' baseClass='quickToolbarButtonBase' data-dojo-props='iconClass:\"quickToolbarButton preview\", showLabel: false'>Preview</button>"+
@@ -377,7 +377,7 @@ define([
             _deleteSelection: function(path) {
                 var panel = this;
                 MessageBox.confirm({
-                    message: "Delete files?"
+                    message: "Delete permanently?"
                 }).then(function() {
                     if (path instanceof Array) {
                         for (var i = 0; i < path.length; i++) {
@@ -725,8 +725,8 @@ define([
                 ).then(
                     function(data) {
                         var url = location.protocol + '//' + location.host + location.pathname;
-                        var infoContent = "<p>Share URL: <a href='" + url + "?share=" + data.id + "'' target='_blank'>" + url + "?share=" + data.id + "</a></p>\n";
-                        infoContent += "<p align='center'>Share id: <span style='background: #e3e3e3; padding: 5px;'>" + data.id + " </span></p>"
+                        var infoContent = "<p>Copy the link: <a href='" + url + "?share=" + data.id + "'' target='_blank'>" + url + "?share=" + data.id + "</a></p>\n";
+                        //infoContent += "<p align='center'>Share id: <span style='background: #e3e3e3; padding: 5px;'>" + data.id + " </span></p>"
 
                         var infoWindow = new dijit.Dialog({
                             title: "Share URL",
