@@ -419,3 +419,42 @@ span.share_toolbar:before {
 .dialogShadedButton .dijitInline.dijitButtonText {
 	color: #326EB7;
 }
+
+.scidrive .inactive .gridxMain .gridxBody .gridxRowTable .gridxCell {
+    color: #999;
+}
+
+.inactive i.fa.fa-folder {
+    color: gray !important;
+}
+
+.inactive i.fa.fa-file-o {
+    color: gray !important;
+}
+
+.inactive i.fa.fa-file-image-o {
+    color: gray !important;
+}
+
+.inactive i.fa.fa-file-table {
+    color: gray !important;
+}
+
+.inactive .quickToolbarSpan {
+    float: inherit;
+    overflow: visible;
+    position: relative;
+    top: 0;
+    z-index: 10;
+}
+
+.gridxSortNode {
+    background-color: #9bcaf7;
+    color: black;
+    overflow: hidden;
+}
+
+.inactive .gridxSortNode {
+    color: #999;
+    background-color: #eee
+}
