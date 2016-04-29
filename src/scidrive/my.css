@@ -99,8 +99,12 @@ div.gridxDnDAnchor {
 	border-right: none;
 }
 
+.inactive i.fa {
+	color: gray !important;	
+}
+
 .scidrive .gridxHeader .gridxHeaderRowInner .gridxCell {
-	background: url("resources/interface/tabEnabled.png") repeat-x scroll center top #E9E9E9;
+	background: #9bcaf7;
 	color: #58595b !important;
 	border-left: 2px solid white !important;
 	border-top: none;
@@ -115,6 +119,9 @@ div.gridxDnDAnchor {
 	border-left: 2px solid #e7e8e9;
 	border-right: none;
 	height: 24px;
+}
+.scidrive .inactive .gridxRowTable .gridxCell {
+	color: #999999;
 }
 
 .scidrive .gridx {
@@ -418,43 +425,4 @@ span.share_toolbar:before {
 
 .dialogShadedButton .dijitInline.dijitButtonText {
 	color: #326EB7;
-}
-
-.scidrive .inactive .gridxMain .gridxBody .gridxRowTable .gridxCell {
-    color: #999;
-}
-
-.inactive i.fa.fa-folder {
-    color: gray !important;
-}
-
-.inactive i.fa.fa-file-o {
-    color: gray !important;
-}
-
-.inactive i.fa.fa-file-image-o {
-    color: gray !important;
-}
-
-.inactive i.fa.fa-file-table {
-    color: gray !important;
-}
-
-.inactive .quickToolbarSpan {
-    float: inherit;
-    overflow: visible;
-    position: relative;
-    top: 0;
-    z-index: 10;
-}
-
-.gridxSortNode {
-    background-color: #9bcaf7;
-    color: black;
-    overflow: hidden;
-}
-
-.inactive .gridxSortNode {
-    color: #999;
-    background-color: #eee
 }
