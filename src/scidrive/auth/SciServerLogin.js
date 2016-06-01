@@ -129,7 +129,7 @@ define([
             if("undefined" === typeof param.headers)
                 param.headers = {};
 
-            if("undefined" !== typeof this.credentials)
+            if("undefined" !== typeof this.credentials && "undefined" !== typeof this.credentials.token)
                 param.headers["X-Auth-Token"] = this.credentials.token;
 
             if(this.isShare) {
