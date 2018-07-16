@@ -15,7 +15,7 @@ define([
 ], function(declare, lang, fx, connect, coreFx, aspect, domConstruct, xhr, JSON, ioQuery, has, sniff, Dialog) {
     return declare("scidrive.SciServerLogin", null, {
 
-        loginPortalUrl: 'http://scitest02.pha.jhu.edu/login-portal/',
+        loginPortalUrl: 'https://portal.sciserver.org/login-portal/',
 
         constructor: function( /*Object*/ kwArgs) {
             lang.mixin(this, kwArgs);
@@ -72,7 +72,7 @@ define([
                 //    document.location.href = curUrl;
                 return;
             }
-            document.location.href = this.loginPortalUrl+'?callbackUrl='+curUrl;
+            document.location.href = this.loginPortalUrl+'Account/Login?callbackUrl='+curUrl;
         },
 
         logout: function(vospace, component, message) {
@@ -93,7 +93,7 @@ define([
 
             dijit.byId("scidriveWidget")._refreshRegions();
 
-            document.location.href = this.loginPortalUrl+"?logout=true"+((typeof message !== 'undefined')?"&message="+message:"");
+            document.location.href = this.loginPortalUrl+"Account/Logout";
         },
 
         request: function(url, method, args) {
